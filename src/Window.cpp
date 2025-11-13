@@ -40,6 +40,7 @@ bool Window::initialize(const std::string& title, const uint16_t width, const ui
         spdlog::error("SDL_CreateWindow Error: {}", (error[0] ? error : "Unknown error"));
         return false;
     }
+    spdlog::info("SDL Window created successfully.");
 
     // Create Vulkan context
     _ctx = std::make_shared<VulkanContext>(_window);
