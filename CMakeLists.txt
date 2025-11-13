@@ -60,47 +60,10 @@ set(INCLUDES ${INCLUDES} external/stb)
 set(INCLUDES ${INCLUDES} external/tinyobjloader)
 set(INCLUDES ${INCLUDES} external/imgui)
 
+# Set asset directory definition
+add_compile_definitions("ASSET_DIR=${CMAKE_SOURCE_DIR}/assets/")
+
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDES})
 message(STATUS "I hate myself so I use cmake!")
-
-# Copy shader files to the build directory
-file(GLOB SHADER_FILES spv/*.spv)
-foreach(SHADER_FILE ${SHADER_FILES})
-    get_filename_component(SHADER_NAME ${SHADER_FILE} NAME)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/spv $<TARGET_FILE_DIR:${PROJECT_NAME}>/spv
-        COMMAND ${CMAKE_COMMAND} -E echo "Copying shader file: ${SHADER_NAME}"
-    )
-endforeach()
-
-# Copy texture folder to the build directory
-file(GLOB TEXTURE_FILES textures/*)
-foreach(TEXTURE_FILE ${TEXTURE_FILES})
-    get_filename_component(TEXTURE_NAME ${TEXTURE_FILE} NAME)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/textures $<TARGET_FILE_DIR:${PROJECT_NAME}>/textures
-        COMMAND ${CMAKE_COMMAND} -E echo "Copying texture file: ${TEXTURE_NAME}"
-    )
-endforeach()
-
-# Copy model folder to the build directory
-file(GLOB MODEL_FILES models/*)
-foreach(MODEL_FILE ${MODEL_FILES})
-    get_filename_component(MODEL_NAME ${MODEL_FILE} NAME)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/models $<TARGET_FILE_DIR:${PROJECT_NAME}>/models
-        COMMAND ${CMAKE_COMMAND} -E echo "Copying model file: ${MODEL_NAME}"
-    )
-endforeach()
-
-# Copy font folder to the build directory
-file(GLOB FONT_FILES fonts/*)
-foreach(FONT_FILE ${FONT_FILES})
-    get_filename_component(FONT_NAME ${FONT_FILE} NAME)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/fonts $<TARGET_FILE_DIR:${PROJECT_NAME}>/fonts
-        COMMAND ${CMAKE_COMMAND} -E echo "Copying font file: ${FONT_NAME}"
-    )
-endforeach()

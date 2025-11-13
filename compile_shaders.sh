@@ -10,14 +10,14 @@ CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Path to shader source folder
-SHADER_FOLDER="shaders"
-
 # Path to glslangValidator (make sure it's in your PATH or set full path here)
 GLSLANG_PATH="glslangValidator"
 
+# Path to shader source folder
+SHADER_FOLDER="shaders"
+
 # Output folder
-OUTPUT_FOLDER="spv"
+OUTPUT_FOLDER="assets/spv"
 
 # Create output folder if it doesn't exist
 mkdir -p "$OUTPUT_FOLDER"
@@ -45,7 +45,7 @@ find "$SHADER_FOLDER_FULL" -type f \( -name "*.vert" -o -name "*.frag" -o -name 
     EXT="${BASENAME##*.}"
     NAME="${BASENAME%.*}"
 
-    OUTPUT_FILE="$TARGET_DIR/${NAME}.${EXT}.spv"
+    OUTPUT_FILE="$TARGET_DIR/${NAME}_${EXT}.spv"
 
     echo -e "${BLUE}Compiling ${YELLOW}$RELATIVE_PATH${NC} -> ${GREEN}${OUTPUT_FILE#$OUTPUT_FOLDER_FULL/}${NC}..."
 

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Window.h"
 
+#include "AssetPath.h"
+
 int main(int argc, char* argv[]) {
 
     // Parse command line arguments for verbosity
@@ -16,6 +18,9 @@ int main(int argc, char* argv[]) {
         }
     }
     spdlog::set_level(log_level);
+
+    // Test AssetPath initialization
+    auto assetPath = AssetPath::getInstance();
 
 
     //Create a window

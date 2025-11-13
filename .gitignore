@@ -1,7 +1,4 @@
 .DS_Store
 
 /build/
-/spv/
-
-compile_shaders.ps1
-compile_run.ps1
+/assets/spv/

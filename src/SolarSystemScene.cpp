@@ -2,6 +2,7 @@
 #include "geometry/MeshFactory.h"
 #include "TextureSampler.h"
 #include "TextureCubemap.h"
+#include "AssetPath.h"
 
 
 SolarSystemScene::SolarSystemScene(std::shared_ptr<VulkanContext> ctx, std::shared_ptr<SwapChain> swapChain)
@@ -72,7 +73,10 @@ void SolarSystemScene::createPipelines()
     glowPassPipelineParams.pushConstantRanges = {{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(GlowPassPushConstants)}};
     glowPassPipelineParams.renderPass = _offscreenRenderPassMSAA->getRenderPass();
     glowPassPipelineParams.msaaSamples = _msaaSamples;
-    _glowPipeline = std::make_unique<Pipeline>(_ctx, "spv/glow/glow_vert.spv", "spv/glow/glow_frag.spv", glowPassPipelineParams);
+    _glowPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/glow/glow_vert.spv"), 
+        AssetPath::getInstance()->get("spv/glow/glow_frag.spv"), 
+        glowPassPipelineParams);
 
     VkDescriptorImageInfo glowPassOutputTexture{};
     glowPassOutputTexture.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -107,7 +111,10 @@ void SolarSystemScene::createPipelines()
     int blurDirection = 0; // 0 for vertical
     VkSpecializationMapEntry blurDirectionMapEntry = {0, 0, sizeof(int)};
     blurPassPipelineParams.fragmentShaderSpecializationInfo = VkSpecializationInfo {1, &blurDirectionMapEntry, sizeof(int), &blurDirection};
-    _blurVertPipeline = std::make_unique<Pipeline>(_ctx, "spv/blur/blur_vert.spv", "spv/blur/blur_frag.spv", blurPassPipelineParams);
+    _blurVertPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/blur/blur_vert.spv"), 
+        AssetPath::getInstance()->get("spv/blur/blur_frag.spv"), 
+        blurPassPipelineParams);
 
 
     // Blur pass pipeline (horizontal)
@@ -125,7 +132,10 @@ void SolarSystemScene::createPipelines()
     blurPassPipelineParams.name = "BlurPassPipeline - Horizontal";
     blurDirection = 1;     // 1 for horizontal
     blurPassPipelineParams.renderPass = _offscreenRenderPassMSAA->getRenderPass();
-    _blurHorizPipeline = std::make_unique<Pipeline>(_ctx, "spv/blur/blur_vert.spv", "spv/blur/blur_frag.spv", blurPassPipelineParams);
+    _blurHorizPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/blur/blur_vert.spv"), 
+        AssetPath::getInstance()->get("spv/blur/blur_frag.spv"), 
+        blurPassPipelineParams);
 
 
     // Composite pass pipeline
@@ -149,7 +159,10 @@ void SolarSystemScene::createPipelines()
     compositePipelineParams.pushConstantRanges = {};
     compositePipelineParams.renderPass = _renderPass->getRenderPass();
     compositePipelineParams.msaaSamples = _msaaSamples;
-    _compositePipeline = std::make_unique<Pipeline>(_ctx, "spv/composite/composite_vert.spv", "spv/composite/composite_frag.spv", compositePipelineParams);
+    _compositePipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/composite/composite_vert.spv"), 
+        AssetPath::getInstance()->get("spv/composite/composite_frag.spv"), 
+        compositePipelineParams);
 
     
     // Planet pipeline
@@ -159,7 +172,10 @@ void SolarSystemScene::createPipelines()
     planetPipelineParams.pushConstantRanges = {{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(glm::mat4)}};
     planetPipelineParams.renderPass = _offscreenRenderPassMSAA->getRenderPass();
     planetPipelineParams.msaaSamples = _msaaSamples;
-    _planetPipeline = std::make_unique<Pipeline>(_ctx, "spv/planet/planet_vert.spv", "spv/planet/planet_frag.spv", planetPipelineParams);
+    _planetPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/planet/planet_vert.spv"), 
+        AssetPath::getInstance()->get("spv/planet/planet_frag.spv"), 
+        planetPipelineParams);
 
     // Orbit pipeline
     PipelineParams orbitPipelineParams;
@@ -170,7 +186,10 @@ void SolarSystemScene::createPipelines()
     orbitPipelineParams.msaaSamples = _msaaSamples;
     orbitPipelineParams.depthTest = true;
     orbitPipelineParams.depthWrite = false;
-    _orbitPipeline = std::make_unique<Pipeline>(_ctx, "spv/orbit/orbit_vert.spv", "spv/orbit/orbit_frag.spv", orbitPipelineParams);
+    _orbitPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/orbit/orbit_vert.spv"), 
+        AssetPath::getInstance()->get("spv/orbit/orbit_frag.spv"), 
+        orbitPipelineParams);
 
     // GlowSphere pipeline
     PipelineParams glowSpherePipelineParams;
@@ -182,7 +201,10 @@ void SolarSystemScene::createPipelines()
     glowSpherePipelineParams.depthTest = true;
     glowSpherePipelineParams.depthWrite = false;
     glowSpherePipelineParams.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    _glowSpherePipeline = std::make_unique<Pipeline>(_ctx, "spv/glowsphere/glowsphere_vert.spv", "spv/glowsphere/glowsphere_frag.spv", glowSpherePipelineParams);
+    _glowSpherePipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/glowsphere/glowsphere_vert.spv"), 
+        AssetPath::getInstance()->get("spv/glowsphere/glowsphere_frag.spv"), 
+        glowSpherePipelineParams);
 
     // SkyBox pipeline
     PipelineParams skyBoxPipelineParams;
@@ -194,7 +216,10 @@ void SolarSystemScene::createPipelines()
     skyBoxPipelineParams.depthTest = true;
     skyBoxPipelineParams.depthWrite = false;
     skyBoxPipelineParams.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    _skyBoxPipeline = std::make_unique<Pipeline>(_ctx, "spv/skybox/skybox_vert.spv", "spv/skybox/skybox_frag.spv", skyBoxPipelineParams);
+    _skyBoxPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/skybox/skybox_vert.spv"), 
+        AssetPath::getInstance()->get("spv/skybox/skybox_frag.spv"), 
+        skyBoxPipelineParams);
 
     // Earth pipeline
     PipelineParams earthPipelineParams;
@@ -203,7 +228,10 @@ void SolarSystemScene::createPipelines()
     earthPipelineParams.pushConstantRanges = {{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(glm::mat4)}};
     earthPipelineParams.renderPass = _offscreenRenderPassMSAA->getRenderPass();
     earthPipelineParams.msaaSamples = _msaaSamples;
-    _earthPipeline = std::make_unique<Pipeline>(_ctx, "spv/earth/earth_vert.spv", "spv/earth/earth_frag.spv", earthPipelineParams);
+    _earthPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/earth/earth_vert.spv"), 
+        AssetPath::getInstance()->get("spv/earth/earth_frag.spv"), 
+        earthPipelineParams);
 
     // Sun pipeline
     PipelineParams sunPipelineParams;
@@ -212,7 +240,10 @@ void SolarSystemScene::createPipelines()
     sunPipelineParams.pushConstantRanges = {{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(glm::mat4)}};
     sunPipelineParams.renderPass = _offscreenRenderPassMSAA->getRenderPass();
     sunPipelineParams.msaaSamples = _msaaSamples;
-    _sunPipeline = std::make_unique<Pipeline>(_ctx, "spv/sun/sun_vert.spv", "spv/sun/sun_frag.spv", sunPipelineParams);
+    _sunPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/sun/sun_vert.spv"), 
+        AssetPath::getInstance()->get("spv/sun/sun_frag.spv"), 
+        sunPipelineParams);
 
     // Object selection pipeline
     PipelineParams objectSelectionPipelineParams;
@@ -221,7 +252,10 @@ void SolarSystemScene::createPipelines()
     objectSelectionPipelineParams.pushConstantRanges = {{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ObjectSelectionPushConstants)}};
     objectSelectionPipelineParams.renderPass = _objectSelectionRenderPass->getRenderPass();
     objectSelectionPipelineParams.blendEnable = false;
-    _objectSelectionPipeline = std::make_unique<Pipeline>(_ctx, "spv/selection/select_vert.spv", "spv/selection/select_frag.spv", objectSelectionPipelineParams);
+    _objectSelectionPipeline = std::make_unique<Pipeline>(_ctx, 
+        AssetPath::getInstance()->get("spv/selection/select_vert.spv"), 
+        AssetPath::getInstance()->get("spv/selection/select_frag.spv"), 
+        objectSelectionPipelineParams);
 }
 
 
@@ -267,7 +301,9 @@ void SolarSystemScene::createModels()
     std::shared_ptr<DeviceMesh> cubeDMesh = std::make_shared<DeviceMesh>(_ctx, cube);
 
     // SkyBox
-    std::shared_ptr<TextureCubemap> skyTexture = std::make_shared<TextureCubemap>(_ctx, "textures/skybox", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<TextureCubemap> skyTexture = std::make_shared<TextureCubemap>(_ctx, 
+        AssetPath::getInstance()->get("textures/skybox"), 
+        VK_FORMAT_R8G8B8A8_SRGB);
     _skyBox = std::make_unique<SkyBox>(_ctx, "Skybox", cubeDMesh, skyTexture);
 
     // Sun
@@ -275,14 +311,18 @@ void SolarSystemScene::createModels()
     _selectableObjects[_sun->getID()] = _sun;
 
     // Mercury
-    std::shared_ptr<Texture2D> mercuryColorTexture = std::make_shared<Texture2D>(_ctx, "textures/mercury/8k_mercury.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> mercuryColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/mercury/8k_mercury.jpg"), 
+        VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> mercury = std::make_shared<Planet>(_ctx, "Mercury", sphereDMesh, mercuryColorTexture, _sun, 
         sizeMercury, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury, spinAtT0Mercury, spinSpeedMercury);
     _selectableObjects[mercury->getID()] = mercury;
     _planets.push_back(std::move(mercury));
 
     // Venus
-    std::shared_ptr<Texture2D> venusColorTexture = std::make_shared<Texture2D>(_ctx, "textures/venus/4k_venus_atmosphere.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> venusColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/venus/4k_venus_atmosphere.jpg"), 
+        VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> venus = std::make_shared<Planet>(_ctx, "Venus", sphereDMesh, venusColorTexture, _sun, 
         sizeVenus, orbitRadVenus, orbitAtT0Venus, orbitSpeedVenus, spinAtT0Venus, spinSpeedVenus);
     _glowSpheres.push_back(std::make_unique<GlowSphere>(_ctx, "VenusGlow", sphereDMesh, venus, glm::vec4(0.74f, 0.69f, 0.2f, 1.f), 3.f, 4.f, sizeVenus * 1.03f, false));
@@ -290,11 +330,16 @@ void SolarSystemScene::createModels()
     _planets.push_back(std::move(venus));
 
     // Earth
-    std::shared_ptr<Texture2D> colorTexture = std::make_shared<Texture2D>(_ctx, "textures/earth/10k_earth_day.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Texture2D> unlitTexture = std::make_shared<Texture2D>(_ctx, "textures/earth/10k_earth_night.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Texture2D> normalTexture = std::make_shared<Texture2D>(_ctx, "textures/earth/2k_earth_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    std::shared_ptr<Texture2D> specularTexture = std::make_shared<Texture2D>(_ctx, "textures/earth/2k_earth_specular.jpeg", VK_FORMAT_R8G8B8A8_UNORM);
-    std::shared_ptr<Texture2D> overlayTexture = std::make_shared<Texture2D>(_ctx, "textures/earth/8k_earth_clouds.png", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> colorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/earth/10k_earth_day.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> unlitTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/earth/10k_earth_night.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> normalTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/earth/2k_earth_normal.png"), VK_FORMAT_R8G8B8A8_UNORM);
+    std::shared_ptr<Texture2D> specularTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/earth/2k_earth_specular.jpeg"), VK_FORMAT_R8G8B8A8_UNORM);
+    std::shared_ptr<Texture2D> overlayTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/earth/8k_earth_clouds.png"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Earth> earth = std::make_shared<Earth>(_ctx, "Earth", sphereDMesh, colorTexture, unlitTexture, normalTexture, specularTexture, overlayTexture, _sun,
          sizeEarth, orbitRadEarth, orbitAtT0Earth, orbitSpeedEarth, spinAtT0Earth, spinSpeedEarth);
     _earth = earth;
@@ -303,55 +348,63 @@ void SolarSystemScene::createModels()
     _planets.push_back(std::move(earth));
 
     // Earth Moon
-    std::shared_ptr<Texture2D> moonColorTexture = std::make_shared<Texture2D>(_ctx, "textures/moon/8k_moon.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> moonColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/moon/8k_moon.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> moon = std::make_shared<Planet>(_ctx, "Moon", sphereDMesh, moonColorTexture, _earth, 
         sizeMoon, orbitRadMoon, orbitAtT0Moon, orbitSpeedMoon, spinAtT0Moon, spinSpeedMoon);
     _selectableObjects[moon->getID()] = moon;
     _planets.push_back(std::move(moon));
 
     // Mars
-    std::shared_ptr<Texture2D> marsColorTexture = std::make_shared<Texture2D>(_ctx, "textures/mars/8k_mars.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> marsColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/mars/8k_mars.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> mars = std::make_shared<Planet>(_ctx, "Mars", sphereDMesh, marsColorTexture, _sun,
         sizeMars, orbitRadMars, orbitAtT0Mars, orbitSpeedMars, spinAtT0Mars, spinSpeedMars);
     _selectableObjects[mars->getID()] = mars;
     _planets.push_back(std::move(mars));
 
     // Jupiter
-    std::shared_ptr<Texture2D> jupiterColorTexture = std::make_shared<Texture2D>(_ctx, "textures/jupiter/4k_jupiter.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> jupiterColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/jupiter/4k_jupiter.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> jupiter = std::make_shared<Planet>(_ctx, "Jupiter", sphereDMesh, jupiterColorTexture, _sun, 
         sizeJupiter, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter, spinAtT0Jupiter, spinSpeedJupiter);
     _selectableObjects[jupiter->getID()] = jupiter;
     _planets.push_back(std::move(jupiter));
 
     // Saturn
-    std::shared_ptr<Texture2D> saturnColorTexture = std::make_shared<Texture2D>(_ctx, "textures/saturn/8k_saturn.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> saturnColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/saturn/8k_saturn.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> saturn = std::make_shared<Planet>(_ctx, "Saturn", sphereDMesh, saturnColorTexture, _sun,
         sizeSaturn, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, spinAtT0Saturn, spinSpeedSaturn);
     _selectableObjects[saturn->getID()] = saturn;
     _planets.push_back(std::move(saturn));
 
     // Saturn Ring
-    std::shared_ptr<Texture2D> ringTexture = std::make_shared<Texture2D>(_ctx, "textures/saturn/8k_saturn_ring_alpha.png", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> ringTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/saturn/8k_saturn_ring_alpha.png"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> saturn_ring = std::make_shared<Planet>(_ctx, "SaturnRing", ringDMesh, ringTexture, _sun, 
         sizeSaturnRing, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, spinAtT0Saturn, spinSpeedSaturn);
     _planets.push_back(std::move(saturn_ring));
 
     // Uranus
-    std::shared_ptr<Texture2D> uranusColorTexture = std::make_shared<Texture2D>(_ctx, "textures/uranus/1k_uranus.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> uranusColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/uranus/1k_uranus.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> uranus = std::make_shared<Planet>(_ctx, "Uranus", sphereDMesh, uranusColorTexture, _sun,
         sizeUranus, orbitRadUranus, orbitAtT0Uranus, orbitSpeedUranus, spinAtT0Uranus, spinSpeedUranus);
     _selectableObjects[uranus->getID()] = uranus;
     _planets.push_back(std::move(uranus));
 
     // Neptune
-    std::shared_ptr<Texture2D> neptuneColorTexture = std::make_shared<Texture2D>(_ctx, "textures/neptune/2k_neptune.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> neptuneColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/neptune/2k_neptune.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> neptune = std::make_shared<Planet>(_ctx, "Neptune", sphereDMesh, neptuneColorTexture, _sun, 
         sizeNeptune, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune, spinAtT0Neptune, spinSpeedNeptune);
     _selectableObjects[neptune->getID()] = neptune;
     _planets.push_back(std::move(neptune));
 
     // Pluto
-    std::shared_ptr<Texture2D> plutoColorTexture = std::make_shared<Texture2D>(_ctx, "textures/pluto/2k_pluto.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Texture2D> plutoColorTexture = std::make_shared<Texture2D>(_ctx, 
+        AssetPath::getInstance()->get("textures/pluto/2k_pluto.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> pluto = std::make_shared<Planet>(_ctx, "Pluto", sphereDMesh, plutoColorTexture, _sun,
         sizePluto, orbitRadPluto, orbitAtT0Pluto, orbitSpeedPluto, spinAtT0Pluto, spinSpeedPluto);
     _selectableObjects[pluto->getID()] = pluto;
