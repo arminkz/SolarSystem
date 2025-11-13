@@ -582,10 +582,10 @@ void SolarSystemScene::update(uint32_t currentImage)
     // Update the planet positions
     _sun->calculateModelMatrix();
     for (const auto& planet : _planets) {
-        planet->calculateModelMatrix(time * 4000.f);
+        planet->calculateModelMatrix(time * 2000.f);
     }
     for (const auto& orbit : _orbits) {
-        orbit->calculateModelMatrix(time * 4000.f);
+        orbit->calculateModelMatrix(time * 2000.f);
     }
     _sunGlowSphere->calculateModelMatrix();
     for (const auto& glowSphere : _glowSpheres) {

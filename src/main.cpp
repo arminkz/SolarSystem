@@ -19,14 +19,10 @@ int main(int argc, char* argv[]) {
     }
     spdlog::set_level(log_level);
 
-    // Test AssetPath initialization
-    auto assetPath = AssetPath::getInstance();
-
-
     //Create a window
     try{
         Window window;
-        if (!window.initialize("VulkanEngine", 1800, 900)) return EXIT_FAILURE;
+        if (!window.initialize("Solar System v1.0 (by @arminkz)", 1600, 900)) return EXIT_FAILURE;
 
         // Start the rendering loop
         window.startRenderingLoop();
