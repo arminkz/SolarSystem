@@ -45,7 +45,7 @@ private:
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
         void* pUserData);
 
-    bool isDeviceSuitable(VkPhysicalDevice device);
+    bool isDeviceSuitable(VkPhysicalDevice device, bool fallback = false);
 
     bool isInstanceLayerAvailable(const char* layerName);
     bool isInstanceExtensionAvailable(const char* extensionName);

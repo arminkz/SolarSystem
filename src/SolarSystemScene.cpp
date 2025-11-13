@@ -848,7 +848,7 @@ uint32_t SolarSystemScene::querySelectionImage(float mouseX, float mouseY) {
         vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _objectSelectionPipeline->getPipelineLayout(), 0, 1, descriptorSets.data(), 0, nullptr);
 
         // Push constants for model
-        ObjectSelectionPushConstants pushConstants {pair.second->getModelMatrix(), pair.second->getID()};
+        ObjectSelectionPushConstants pushConstants {pair.second->getModelMatrix(), static_cast<uint32_t>(pair.second->getID())};
         vkCmdPushConstants(cmdBuffer, _objectSelectionPipeline->getPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ObjectSelectionPushConstants), &pushConstants);
 
         vkCmdDrawIndexed(cmdBuffer, static_cast<uint32_t>(pair.second->getDeviceMesh()->getIndicesCount()), 1, 0, 0, 0);

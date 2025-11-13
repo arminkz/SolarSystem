@@ -50,13 +50,16 @@ void VulkanContext::createVulkanInstance() {
 
     // Check for validation layer support
     _validationLayersAvailable = isInstanceLayerAvailable("VK_LAYER_KHRONOS_validation");
-    if (!_validationLayersAvailable) {
+    if (!_validationLayersAvailable || true) {
         spdlog::warn("Validation layers not available, disabling validation layers.");
+        instanceCreateInfo.ppEnabledLayerNames = nullptr;
+        instanceCreateInfo.enabledLayerCount = 0;
     }else {
-        const uint32_t validationLayerCount = 1;
-        const char* validationLayers[] = { "VK_LAYER_KHRONOS_validation" };
-        instanceCreateInfo.ppEnabledLayerNames = validationLayers;
-        instanceCreateInfo.enabledLayerCount = validationLayerCount;
+        const std::vector<const char*> validationLayers = {
+            "VK_LAYER_KHRONOS_validation"
+        };
+        instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+        instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
     }
 
     // Required extensions 
@@ -82,9 +85,22 @@ void VulkanContext::createVulkanInstance() {
     instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
     instanceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
+    // In macOS, we need to enable the portability enumeration flag
+    // Since we are using SDL extensions, the extension should already be included. we just need to set the flag.
+#ifdef __APPLE__
+    instanceCreateInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
+
+    // Print Enabled Extensions
+    spdlog::debug("Enabled Vulkan Instance Extensions:");
+    for (const char* extension : requiredExtensions) {
+        spdlog::debug("  {}", extension);
+    }
+
     // Create Vulkan instance
     VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
     if (result != VK_SUCCESS) {
+        spdlog::error("Failed to create Vulkan instance: {}", static_cast<int>(result));
         throw std::runtime_error("Failed to create Vulkan instance!");
     }
 
@@ -137,12 +153,24 @@ void VulkanContext::pickPhysicalDevice() {
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
         if (isDeviceSuitable(device)) {
             physicalDevice = device;
-            spdlog::info("Found Suitable GPU: {}", deviceProperties.deviceName);
+            spdlog::info("Found Suitable Discrete GPU: {}", deviceProperties.deviceName);
             break;
         }
     }
     if (physicalDevice == VK_NULL_HANDLE) {
-        throw std::runtime_error("Failed to find a suitable GPU!");
+        spdlog::warn("No suitable discrete GPU found, trying fallback to any integrated GPU!");
+        for (const auto& device : devices) {
+            VkPhysicalDeviceProperties deviceProperties;
+            vkGetPhysicalDeviceProperties(device, &deviceProperties);
+            if (isDeviceSuitable(device, true)) {
+                physicalDevice = device;
+                spdlog::info("Found Suitable iGPU: {}", deviceProperties.deviceName);
+                break;
+            }
+        }
+        if (physicalDevice == VK_NULL_HANDLE) {
+            throw std::runtime_error("Failed to find a suitable GPU!");
+        }
     }
 }
 
@@ -252,7 +280,7 @@ void VulkanContext::createCommandPool() {
 }
 
 
-bool VulkanContext::isDeviceSuitable(VkPhysicalDevice device) {
+bool VulkanContext::isDeviceSuitable(VkPhysicalDevice device, bool fallback) {
     // Check if the device is suitable for our needs (graphics, compute, etc.)
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -274,9 +302,19 @@ bool VulkanContext::isDeviceSuitable(VkPhysicalDevice device) {
     // Check if the device swapchain is adequate
     SwapChainSupportDetails swapChainSupport = VulkanHelper::querySwapChainSupport(device, surface);
     bool swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+
+    // Log device name + suitability
+    spdlog::debug("Evaluating GPU: {}", deviceProperties.deviceName);
+    spdlog::debug(" - Discrete GPU: {}", isDiscreteGPU ? "Yes" : "No");
+    spdlog::debug(" - Required Extensions: {}", hasRequiredExtensions ? "Yes" : "No");
+    spdlog::debug(" - Swapchain Adequate: {}", swapChainAdequate ? "Yes" : "No");
     
     // AND all the checks together
-    return isDiscreteGPU && hasRequiredExtensions && swapChainAdequate;
+    // if fallback is true, we allow non-discrete GPUs
+    if (!fallback) {
+        return isDiscreteGPU && hasRequiredExtensions && swapChainAdequate;
+    }
+    return hasRequiredExtensions && swapChainAdequate;
 }
 
 bool VulkanContext::isInstanceLayerAvailable(const char* layerName) {

@@ -22,9 +22,15 @@ OUTPUT_FOLDER="spv"
 # Create output folder if it doesn't exist
 mkdir -p "$OUTPUT_FOLDER"
 
-# Resolve full paths
-SHADER_FOLDER_FULL=$(realpath "$SHADER_FOLDER")
-OUTPUT_FOLDER_FULL=$(realpath "$OUTPUT_FOLDER")
+# Resolve full paths (macOS compatible)
+if command -v realpath &> /dev/null; then
+    SHADER_FOLDER_FULL=$(realpath "$SHADER_FOLDER")
+    OUTPUT_FOLDER_FULL=$(realpath "$OUTPUT_FOLDER")
+else
+    # Fallback for macOS without realpath
+    SHADER_FOLDER_FULL=$(cd "$SHADER_FOLDER" && pwd)
+    OUTPUT_FOLDER_FULL=$(cd "$OUTPUT_FOLDER" && pwd)
+fi
 
 # Find all shader files
 find "$SHADER_FOLDER_FULL" -type f \( -name "*.vert" -o -name "*.frag" -o -name "*.comp" -o -name "*.geom" -o -name "*.tesc" -o -name "*.tese" \) | while read -r INPUT_FILE; do
