@@ -27,6 +27,7 @@ public:
     void handleMouseClick(float mouseX, float mouseY) override;
     void handleMouseDrag(float dx, float dy) override;
     void handleMouseWheel(float dy) override;
+    void handleKeyDown(int key, int scancode, int modifiers) override;
 
     const DescriptorSet* getSceneDescriptorSet() const { return _sceneDescriptorSets[_currentFrame].get(); }
 
@@ -37,12 +38,16 @@ private:
         alignas(16) glm::mat4 view;
         alignas(16) glm::mat4 projection;
 
-        alignas(4) float time;
+        alignas(4) float time = 0.0f; // in seconds
         alignas(16) glm::vec3 cameraPosition;
         alignas(16) glm::vec3 lightColor;
     } _sceneInfo;
     std::array<std::unique_ptr<UniformBuffer<SceneInfo>>, MAX_FRAMES_IN_FLIGHT> _sceneInfoUBOs;
     std::array<std::unique_ptr<DescriptorSet>, MAX_FRAMES_IN_FLIGHT> _sceneDescriptorSets;
+
+    // Time
+    bool _isPaused = false;
+    TimePoint _lastFrameTime = std::chrono::high_resolution_clock::now();
 
     // Camera
     std::unique_ptr<Camera> _camera = nullptr;
@@ -194,6 +199,10 @@ private:
     const float spinSpeedPluto = -0.26f;
 
 
-
+    //Misc
+    void saveSceneState(const std::string& filename);
+    void loadSceneState(const std::string& filename);
 
 };
+
+

@@ -25,12 +25,26 @@ public:
     void rotateHorizontally(float delta);
     void rotateVertically(float delta);
 
+    // Calculated properties
     glm::mat4 getViewMatrix();
     glm::vec3 getPosition();
-    float getRadius() const { return _radius; }
 
+    // Raw properties
+    float getRadius() const { return _radius; }
+    void setRadius(float radius) { _radius = glm::clamp(radius, _minRadius, _maxRadius); };
+
+    glm::vec3 getTarget() const { return _target; }
     void setTarget(const glm::vec3& target);
     void setTargetAnimated(const glm::vec3& target);
+
+    glm::vec3 getForward() const { return _forward; }
+    void setForward(const glm::vec3& forward) { _forward = glm::normalize(forward); };
+
+    glm::vec3 getLeft() const { return _left; }
+    void setLeft(const glm::vec3& left) { _left = glm::normalize(left); };
+
+    glm::vec3 getUp() const { return _up; }
+    void setUp(const glm::vec3& up) { _up = glm::normalize(up); };
 
     void advanceAnimation(float deltaTime);
 

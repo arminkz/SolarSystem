@@ -29,6 +29,7 @@ public:
     void handleMouseClick(float mouseX, float mouseY);
     void handleMouseDrag(float dx, float dy);
     void handleMouseWheel(float dy);
+    void handleKeyDown(int key, int scancode, int modifiers);
 
 private:
     std::shared_ptr<VulkanContext> _ctx;

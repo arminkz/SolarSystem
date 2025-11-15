@@ -572,20 +572,23 @@ void SolarSystemScene::update(uint32_t currentImage)
 {
     Scene::update(currentImage);
 
-    static auto startTime = std::chrono::high_resolution_clock::now();
-    auto currentTime = std::chrono::high_resolution_clock::now();
-
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+    // Advance time
+    auto elapsedTime = std::chrono::high_resolution_clock::now() - _lastFrameTime;
+    float elapsedSeconds = std::chrono::duration<float, std::chrono::seconds::period>(elapsedTime).count();
+    if(!_isPaused) {
+        _sceneInfo.time += elapsedSeconds;
+    }
+    _lastFrameTime = std::chrono::high_resolution_clock::now();
 
     VkExtent2D swapChainExtent = _swapChain->getSwapChainExtent();
 
     // Update the planet positions
     _sun->calculateModelMatrix();
     for (const auto& planet : _planets) {
-        planet->calculateModelMatrix(time * 2000.f);
+        planet->calculateModelMatrix(_sceneInfo.time * 2000.f);
     }
     for (const auto& orbit : _orbits) {
-        orbit->calculateModelMatrix(time * 2000.f);
+        orbit->calculateModelMatrix(_sceneInfo.time * 2000.f);
     }
     _sunGlowSphere->calculateModelMatrix();
     for (const auto& glowSphere : _glowSpheres) {
@@ -594,13 +597,13 @@ void SolarSystemScene::update(uint32_t currentImage)
 
     // Update camera position based on time
     _camera->setTarget(_selectableObjects[_currentTargetObjectID]->getPosition());
-    _camera->advanceAnimation(time - _sceneInfo.time);
+    // note: camera animations are not affected by pause state
+    _camera->advanceAnimation(elapsedSeconds);
 
     // Update SceneInfo
     _sceneInfo.view = _camera->getViewMatrix();
     _sceneInfo.projection = glm::perspective(glm::radians(45.f), (float)swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 4000.f);
     _sceneInfo.projection[1][1] *= -1; // Invert Y axis for Vulkan
-    _sceneInfo.time = time;
     _sceneInfo.cameraPosition = _camera->getPosition();
 
     // Update the scene information UBO
@@ -985,4 +988,112 @@ void SolarSystemScene::handleMouseWheel(float dy)
     // For example, you can update the camera zoom level
     float zoomDelta = dy * _camera->getRadius() * 0.03f; // Adjust the zoom speed as needed
     _camera->changeZoom(zoomDelta);
+}
+
+
+void SolarSystemScene::handleKeyDown(int key, int scancode, int modifiers)
+{
+    switch(key) {
+        case SDLK_SPACE:
+            // Toggle pause
+            _isPaused = !_isPaused;
+            spdlog::info("Simulation {}", _isPaused ? "paused" : "resumed");
+            break;
+        case SDLK_0:
+            // Reset time to zero
+            _sceneInfo.time = 0.f;
+            spdlog::info("Simulation time reset to zero");
+            break;
+        case SDLK_S:
+            // Save scene state to file
+            saveSceneState("solar_system_scene_state.txt");
+            spdlog::info("Scene state saved to solar_system_scene_state.txt");
+            break;
+        case SDLK_L:
+            // Load scene state from file
+            loadSceneState("solar_system_scene_state.txt");
+            spdlog::info("Scene state loaded from solar_system_scene_state.txt");
+            break;
+        default:
+            break;
+    }
+}
+
+
+void SolarSystemScene::saveSceneState(const std::string& filename)
+{
+    std::ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        spdlog::error("Failed to open file for saving scene state: {}", filename);
+        return;
+    }
+
+    // Save scene time
+    outFile << _sceneInfo.time << std::endl;
+
+    // Save current target object ID
+    outFile << _currentTargetObjectID << std::endl;
+
+    // Save camera state
+    // Up
+    outFile << _camera->getUp().x << "," << _camera->getUp().y << "," << _camera->getUp().z << std::endl;
+    // Forward
+    outFile << _camera->getForward().x << "," << _camera->getForward().y << "," << _camera->getForward().z << std::endl;
+    // Left
+    outFile << _camera->getLeft().x << "," << _camera->getLeft().y << "," << _camera->getLeft().z << std::endl;
+    // Target
+    outFile << _camera->getTarget().x << "," << _camera->getTarget().y << "," << _camera->getTarget().z << std::endl;
+    // Radius
+    outFile << _camera->getRadius() << std::endl;
+
+    outFile.close();
+}
+
+
+void SolarSystemScene::loadSceneState(const std::string& filename)
+{
+    std::ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        spdlog::error("Failed to open file for loading scene state: {}", filename);
+        return;
+    }
+
+    std::string line;
+
+    // Load scene time
+    std::getline(inFile, line);
+    _sceneInfo.time = std::stof(line);
+
+    // Load current target object ID
+    std::getline(inFile, line);
+    _currentTargetObjectID = std::stoul(line);
+
+    // Load camera state
+    // Up
+    std::getline(inFile, line);
+    glm::vec3 up;
+    sscanf(line.c_str(), "%f,%f,%f", &up.x, &up.y, &up.z);
+    _camera->setUp(up);
+    // Forward
+    std::getline(inFile, line);
+    glm::vec3 forward;
+    sscanf(line.c_str(), "%f,%f,%f", &forward.x, &forward.y, &forward.z);
+    _camera->setForward(forward);
+    // Left
+    std::getline(inFile, line);
+    glm::vec3 left;
+    sscanf(line.c_str(), "%f,%f,%f", &left.x, &left.y, &left.z);
+    _camera->setLeft(left);
+    // Target
+    std::getline(inFile, line);
+    glm::vec3 target;
+    sscanf(line.c_str(), "%f,%f,%f", &target.x, &target.y, &target.z);
+    _camera->setTarget(target);
+    // Radius
+    std::getline(inFile, line);
+    float radius = std::stof(line);
+    _camera->setRadius(radius);
+
+
+    inFile.close();
 }

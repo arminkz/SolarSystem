@@ -233,3 +233,9 @@ void Renderer::handleMouseWheel(float dy) {
     // Handle mouse wheel events in the scene
     _scene->handleMouseWheel(dy);
 }
+
+
+void Renderer::handleKeyDown(int key, int scancode, int modifiers) {
+    // Handle key down events in the scene
+    _scene->handleKeyDown(key, scancode, modifiers);
+}
