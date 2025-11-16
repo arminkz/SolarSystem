@@ -19,12 +19,9 @@ fBm Magma effect | Sun |
 
 For sun I am also drawing a Glow Sphere. This sphere is rendered specially and its allways facing the camera. In this figure you can see the combination of effects for the sun.
 
-
-![Sun Glow](doc/sun/sun_glow.png)
-
-
-
-
+<p align="center">
+  <img src="doc/sun/sun_glow.png" alt="Sun Glow Effect">
+</p>
 
 
 
@@ -74,3 +71,28 @@ Adding a cloud texture layer and generating shadows based on the direction of li
 <p align="center">
   <img src="doc/earth/earth_cloudshadow.gif" alt="Earth with Clouds and Shadows">
 </p>
+
+
+# Orbits
+
+Orbits are planes rendered with an special fragment shader.
+
+
+# Skybox
+
+Skybox is created by creating a Cubemap texture. an special shader is then used to draw the skybox using the cubemap texture.
+
+
+<p align="center">
+  <img src="doc/skybox.gif" alt="Skybox">
+</p>
+
+
+
+
+
+
+
+# Bloom Effect
+
+Bloom effect has been implemented using a multi pass rendering system. 
