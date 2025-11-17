@@ -189,8 +189,14 @@ The bloom implementation uses:
 |-----------|----------|
 | ![Bloom Off](doc/bloom_off.gif) | ![Bloom On](doc/bloom_on.gif) |
 
-## Selection Rendering
-The renderer executes multiple passes each frame:
+## Object selection via off-screen framebuffer
+The program renders the scene to an off-screen framebuffer where each object is drawn using a unique solid color that represents its ID. When the user clicks, sample the corresponding pixel from this ID texture and decode the color to determine which object was selected.
+
+
+| Scene | Off-screen Framebuffer |
+|-------|------------------------|
+| ![Bloom Off](doc/obj_sel1.jpg) | ![Bloom Off](doc/obj_sel2.jpg) |
+
 
 ## Orbital Mechanics
 Each celestial body follows Kepler's laws:
