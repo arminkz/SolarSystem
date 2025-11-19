@@ -95,19 +95,28 @@ The application implements a complete Vulkan rendering pipeline from scratch:
 I have used a 3D noise function and [fractal Brownian Motion (fBm)](https://en.wikipedia.org/wiki/Fractional_Brownian_motion) to generate a magma like effect for sun's surface. Its variable by time!
 
 
-fBm Magma effect | Sun |
-|----------------|-----|
-![Earth Day](doc/sun/magma.gif) | ![Earth Day](doc/sun/sun.png) |
+fBm Magma effect |
+|----------------|
+| ![fBm Magma](doc/sun/magma.gif) |
+
+
+<p align="center">
+  <img src="doc/sun/sun.png" alt="Sun">
+</p>
 
 
 ### Glow Effect
 
-For sun I am also drawing a Glow Sphere. This sphere is rendered specially and its allways facing the camera. In this figure you can see the combination of effects for the sun.
+For sun I am also drawing a Glow Sphere. This sphere is rendered specially and Its always prependicular to the view. In this figure you can see the combination of effects for the sun.
 
-<p align="center">
-  <img src="doc/sun/sun_glow.png" alt="Sun Glow Effect">
-</p>
 
+<div align="center">
+
+| Sun | Glow Shpere | Sun + Glow Sphere + Bloom |
+|-----|-------------|---------------------------|
+| ![fBm Magma](doc/sun/sun_glow0.png) | ![fBm Magma](doc/sun/sun_glow1.png) | ![fBm Magma](doc/sun/sun_glow2.png) |
+
+</div>
 
 
 ### Earth
@@ -125,7 +134,7 @@ Using only these two textures for rendering Earth, we achieve:
 </p>
 
 
-#### UV Map for Mountain Shadows
+#### Normal mapping for Mountain Shadows
 
 Because our Earth model is made from an ideal sphere, the surface of Earth looks too smooth. In reality, mountains cast complicated shadows on the surface, and the shadow representation of bumpy geography adds realism to the texture.
 
@@ -185,18 +194,28 @@ The bloom implementation uses:
 - **HDR composition** - Tone mapping with exposure control
 - **Ping-pong framebuffers** - Efficient iterative blur passes
 
+
+<div align="center">
+
 | Bloom Off | Bloom On |
 |-----------|----------|
 | ![Bloom Off](doc/bloom_off.gif) | ![Bloom On](doc/bloom_on.gif) |
+
+</div>
+
+
 
 ## Object selection via off-screen framebuffer
 The program renders the scene to an off-screen framebuffer where each object is drawn using a unique solid color that represents its ID. When the user clicks, sample the corresponding pixel from this ID texture and decode the color to determine which object was selected.
 
 
+<div align="center">
+
 | Scene | Off-screen Framebuffer |
 |-------|------------------------|
-| ![Bloom Off](doc/obj_sel1.jpg) | ![Bloom Off](doc/obj_sel2.jpg) |
+| ![Bloom Off](doc/obj_sel1.png) | ![Bloom Off](doc/obj_sel2.png) |
 
+</div>
 
 ## Orbital Mechanics
 Each celestial body follows Kepler's laws:
