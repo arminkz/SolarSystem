@@ -138,10 +138,13 @@ Using only these two textures for rendering Earth, we achieve:
 
 Because our Earth model is made from an ideal sphere, the surface of Earth looks too smooth. In reality, mountains cast complicated shadows on the surface, and the shadow representation of bumpy geography adds realism to the texture.
 
+<div align="center">
+
 | Without UV Maps | With UV Maps |
 |-----------------|--------------|
 | ![Earth Day](doc/earth/uvmap_off.png) | ![Earth Night](doc/earth/uvmap_on.png) |
 
+</div>
 
 #### Reflection from Oceans
 
