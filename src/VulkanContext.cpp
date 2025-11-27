@@ -48,22 +48,24 @@ void VulkanContext::createVulkanInstance() {
     instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceCreateInfo.pApplicationInfo = &appInfo;
 
-    bool enableVL = false;
+    bool enableVL = true;
 
 #if __APPLE__
     enableVL = false; // Disable validation layers on macOS for now (MoltenVK issues)
 #endif
 
+
     // Check for validation layer support
+    const std::vector<const char*> validationLayers = {
+        "VK_LAYER_KHRONOS_validation"
+    };
     _validationLayersAvailable = isInstanceLayerAvailable("VK_LAYER_KHRONOS_validation");
     if (!_validationLayersAvailable || !enableVL) {
         spdlog::warn("Validation layers not available, disabling validation layers.");
         instanceCreateInfo.ppEnabledLayerNames = nullptr;
         instanceCreateInfo.enabledLayerCount = 0;
     }else {
-        const std::vector<const char*> validationLayers = {
-            "VK_LAYER_KHRONOS_validation"
-        };
+        spdlog::info("Validation layers are available!");
         instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
         instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
     }
