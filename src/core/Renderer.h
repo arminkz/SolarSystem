@@ -9,7 +9,7 @@ class Renderer
 public:
     Renderer(std::shared_ptr<VulkanContext> ctx, std::shared_ptr<SwapChain> swapChain)
         : _ctx(std::move(ctx)), _swapChain(std::move(swapChain)) {}
-    ~Renderer() = default;
+    virtual ~Renderer() = default;
 
     // Update the scene (called every frame before drawing) (0 < currentImage < MAX_FRAMES_IN_FLIGHT)
     virtual void update(uint32_t currentImage) { _currentFrame = currentImage; }

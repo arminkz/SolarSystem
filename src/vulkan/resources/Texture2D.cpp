@@ -194,6 +194,7 @@ Texture2D::~Texture2D()
 }
 
 void Texture2D::cleanup() {
+    vkDestroySampler(_ctx->device, _textureSampler, nullptr);
     vkDestroyImageView(_ctx->device, _textureImageView, nullptr);
     vkDestroyImage(_ctx->device, _textureImage, nullptr);
     vkFreeMemory(_ctx->device, _textureImageMemory, nullptr);
@@ -310,24 +311,4 @@ VkDescriptorImageInfo Texture2D::getDescriptorInfo() const
     textureInfo.imageView = _textureImageView;
     textureInfo.sampler = _textureSampler;
     return textureInfo;
-}
-
-
-// Static member initialization
-Texture2D* Texture2D::dummyTexture = nullptr;
-
-Texture2D* Texture2D::getDummy(std::shared_ptr<VulkanContext> ctx) {
-    if (!dummyTexture) {
-        // Create a dummy texture with a single white pixel
-        uint8_t pixelData[4] = { 255, 255, 255, 255 }; // White pixel
-        dummyTexture = new Texture2D(ctx, pixelData, 1, 1, VK_FORMAT_R8G8B8A8_UNORM);
-    }
-    return dummyTexture;
-}
-
-void Texture2D::cleanupDummy() {
-    if (dummyTexture) {
-        delete dummyTexture;
-        dummyTexture = nullptr;
-    }
 }

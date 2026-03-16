@@ -20,10 +20,6 @@ public:
 
     VkDescriptorImageInfo getDescriptorInfo() const;
 
-    // Singleton pattern for dummy texture
-    static Texture2D* getDummy(std::shared_ptr<VulkanContext> ctx);
-    static void cleanupDummy();
-
 private:
     std::shared_ptr<VulkanContext> _ctx;
 
@@ -39,5 +35,4 @@ private:
     
     void generateMipmaps();
 
-    static Texture2D* dummyTexture;
 };

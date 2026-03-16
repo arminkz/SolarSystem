@@ -3,6 +3,8 @@
 VulkanContext::VulkanContext(SDL_Window* window)
     : window(window)
 {
+    _basePath = SDL_GetBasePath() ? SDL_GetBasePath() : "";
+
     createVulkanInstance();
     setupDebugMessenger();
     createSurface(window);
@@ -366,7 +368,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanContext::debugCallback(
 }
 
 void VulkanContext::loadPipelineCache(const std::string& filename) {
-    std::string path = std::string(SDL_GetBasePath()) + filename;
+    std::string path = _basePath + filename;
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     std::vector<char> cacheData;
     if (file.is_open()) {
@@ -384,9 +386,9 @@ void VulkanContext::loadPipelineCache(const std::string& filename) {
         if (vkCreatePipelineCache(device, &cacheCreateInfo, nullptr, &pipelineCache) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline cache from file.");
         }
-        spdlog::info("Pipeline cache loaded from file: {}", filename);
+        spdlog::info("Pipeline cache loaded from file: {}", path);
     } else {
-        spdlog::warn("No pipeline cache file found, creating a new one.");
+        spdlog::warn("No pipeline cache file found at {}, creating a new one.", path);
         VkPipelineCacheCreateInfo cacheCreateInfo{};
         cacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
         vkCreatePipelineCache(device, &cacheCreateInfo, nullptr, &pipelineCache);
@@ -399,14 +401,14 @@ void VulkanContext::savePipelineCache(const std::string& filename) {
     std::vector<char> cacheData(dataSize);
     vkGetPipelineCacheData(device, pipelineCache, &dataSize, cacheData.data());
 
-    std::string path = std::string(SDL_GetBasePath()) + filename;
+    std::string path = _basePath + filename;
     std::ofstream file(path, std::ios::binary);
     if (file.is_open()) {
         file.write(cacheData.data(), dataSize);
         file.close();
-        spdlog::info("Pipeline cache saved to file: {}", filename);
+        spdlog::info("Pipeline cache saved to file: {}", path);
     } else {
-        spdlog::error("Failed to save pipeline cache to file: {}", filename);
+        spdlog::error("Failed to save pipeline cache to file: {}", path);
     }
 }
 

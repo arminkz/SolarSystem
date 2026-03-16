@@ -42,6 +42,25 @@ SolarSystemRenderer::SolarSystemRenderer(std::shared_ptr<VulkanContext> ctx, std
 }
 
 
+SolarSystemRenderer::~SolarSystemRenderer()
+{
+    // Wait for any unfinished GPU tasks
+    vkDeviceWaitIdle(_ctx->device);
+
+    _planetPipeline = nullptr;
+    _orbitPipeline = nullptr;
+    _glowSpherePipeline = nullptr;
+    _skyBoxPipeline = nullptr;
+    _sunPipeline = nullptr;
+    _earthPipeline = nullptr;
+
+    _renderPass = nullptr;
+    _offscreenRenderPass = nullptr;
+    _offscreenRenderPassMSAA = nullptr;
+    _objectSelectionRenderPass = nullptr;
+}
+
+
 void SolarSystemRenderer::onSwapChainRecreated()
 {
     vkDeviceWaitIdle(_ctx->device);
@@ -85,25 +104,6 @@ void SolarSystemRenderer::onSwapChainRecreated()
         Descriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, blurHorizOut),
         Descriptor(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, normalOut),
     });
-}
-
-
-SolarSystemRenderer::~SolarSystemRenderer()
-{
-    // Wait for any unfinished GPU tasks
-    vkDeviceWaitIdle(_ctx->device);
-
-    _planetPipeline = nullptr;
-    _orbitPipeline = nullptr;
-    _glowSpherePipeline = nullptr;
-    _skyBoxPipeline = nullptr;
-    _sunPipeline = nullptr;
-    _earthPipeline = nullptr;
-
-    _renderPass = nullptr;
-    _offscreenRenderPass = nullptr;
-    _offscreenRenderPassMSAA = nullptr;
-    _objectSelectionRenderPass = nullptr;
 }
 
 

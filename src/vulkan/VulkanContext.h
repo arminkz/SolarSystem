@@ -28,6 +28,7 @@ public:
 
 private:
     bool _validationLayersAvailable = true;
+    std::string _basePath;
 
     void createVulkanInstance();
     void setupDebugMessenger();
