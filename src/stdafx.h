@@ -21,8 +21,8 @@
 
 // [ImGui]
 #include "imgui.h"
-#include "imgui-impl/imgui_impl_sdl3.h"
-#include "imgui-impl/imgui_impl_vulkan.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_vulkan.h"
 
 // [Standard libraries: basic]
 #include <algorithm>
@@ -53,8 +53,8 @@
 #include <unordered_set>
 #include <vector>
 
+// [Time]
+using TimePoint = std::chrono::high_resolution_clock::time_point;
+
 // [Global constants]
 const int MAX_FRAMES_IN_FLIGHT = 2;
-
-// [Time Typedefs]
-using TimePoint = std::chrono::high_resolution_clock::time_point;

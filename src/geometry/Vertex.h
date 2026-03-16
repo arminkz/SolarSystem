@@ -1,5 +1,6 @@
 #pragma once
-#include "../stdafx.h"
+
+#include "stdafx.h"
 
 struct Vertex {
     glm::vec3 pos;

@@ -1,7 +1,6 @@
 #include "stdafx.h"
-#include "Window.h"
+#include "core/Window.h"
 
-#include "AssetPath.h"
 
 int main(int argc, char* argv[]) {
 
@@ -19,10 +18,12 @@ int main(int argc, char* argv[]) {
     }
     spdlog::set_level(log_level);
 
+
+    spdlog::info("Starting Solar System Simulation v1.0");
     //Create a window
     try{
         Window window;
-        if (!window.initialize("Solar System v1.0 (by @arminkz)", 1600, 900)) return EXIT_FAILURE;
+        if (!window.initialize("Solar System v1.0 (by @arminkz)", 1920, 1080)) return EXIT_FAILURE;
 
         // Start the rendering loop
         window.startRenderingLoop();

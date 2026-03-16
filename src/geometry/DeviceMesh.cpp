@@ -1,5 +1,6 @@
 #include "DeviceMesh.h"
-#include "../VulkanHelper.h"
+
+#include "vulkan/VulkanHelper.h"
 
 DeviceMesh::DeviceMesh(std::shared_ptr<VulkanContext> ctx, const HostMesh& mesh)
     : _ctx(std::move(ctx))
@@ -26,10 +27,10 @@ void DeviceMesh::createVertexBuffer(const HostMesh& mesh)
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
         VulkanHelper::createBuffer(_ctx,
-            bufferSize, 
+            bufferSize,
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
-            stagingBuffer, stagingBufferMemory);
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            false, stagingBuffer, stagingBufferMemory);
     
         void* data;
         // Map the buffer memory into CPU addressable space
@@ -42,9 +43,9 @@ void DeviceMesh::createVertexBuffer(const HostMesh& mesh)
         // Create the vertex buffer
         VulkanHelper::createBuffer(_ctx,
             bufferSize,
-            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            _vertexBuffer, _vertexBufferMemory);
+            false, _vertexBuffer, _vertexBufferMemory);
     
         // Copy the data from the staging buffer to the vertex buffer
         VulkanHelper::copyBuffer(_ctx, stagingBuffer, _vertexBuffer, bufferSize);
@@ -63,10 +64,10 @@ void DeviceMesh::createIndexBuffer(const HostMesh& mesh)
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
     VulkanHelper::createBuffer(_ctx,
-        bufferSize, 
+        bufferSize,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
-        stagingBuffer, stagingBufferMemory);
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        false, stagingBuffer, stagingBufferMemory);
 
     void* data;
     // Map the buffer memory into CPU addressable space
@@ -79,9 +80,9 @@ void DeviceMesh::createIndexBuffer(const HostMesh& mesh)
     // Create the index buffer
     VulkanHelper::createBuffer(_ctx,
         bufferSize,
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 
+        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        _indexBuffer, _indexBufferMemory);
+        false, _indexBuffer, _indexBufferMemory);
 
     // Copy the data from the staging buffer to the index buffer
     VulkanHelper::copyBuffer(_ctx, stagingBuffer, _indexBuffer, bufferSize);

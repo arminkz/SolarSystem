@@ -26,7 +26,17 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 add_subdirectory(external/spdlog)
 add_subdirectory(external/glm)
 add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
-add_subdirectory(external/imgui)
+
+# ImGui sources
+set(IMGUI_SOURCES
+    external/imgui/imgui.cpp
+    external/imgui/imgui_draw.cpp
+    external/imgui/imgui_tables.cpp
+    external/imgui/imgui_widgets.cpp
+    external/imgui/imgui_demo.cpp
+    external/imgui/backends/imgui_impl_sdl3.cpp
+    external/imgui/backends/imgui_impl_vulkan.cpp
+)
 
 # Libraries
 set(LIBRARIES
@@ -34,20 +44,20 @@ set(LIBRARIES
     spdlog::spdlog
     glm::glm
     SDL3::SDL3
-    imgui
 )
 
 # Handle .cpp files
 file(GLOB SOURCES
-    src/*
-    src/font/*
-    src/geometry/*
-    src/loader/*
-    src/utilities/*
-    src/imgui-impl/*
-    src/models/*
-    src/interface/*
+    src/*.cpp
+    src/core/*.cpp
+    src/geometry/*.cpp
+    src/gui/*.cpp
+    src/scene/*.cpp
+    src/scene/models/*.cpp
+    src/vulkan/*.cpp
+    src/vulkan/resources/*.cpp
 )
+list(APPEND SOURCES ${IMGUI_SOURCES})
 
 # Add resources.rc file to the sources if on Windows
 if (WIN32)
@@ -59,6 +69,7 @@ set(INCLUDES ${INCLUDES} src)
 set(INCLUDES ${INCLUDES} external/stb)
 set(INCLUDES ${INCLUDES} external/tinyobjloader)
 set(INCLUDES ${INCLUDES} external/imgui)
+set(INCLUDES ${INCLUDES} external/imgui/backends)
 
 # Set asset directory definition
 add_compile_definitions("ASSET_DIR=${CMAKE_SOURCE_DIR}/assets/")

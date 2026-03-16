@@ -1,6 +1,5 @@
 #include "Vertex.h"
 
-
 VkVertexInputBindingDescription Vertex::getBindingDescription() {
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = 0;
