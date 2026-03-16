@@ -38,6 +38,8 @@ SolarSystemRenderer::SolarSystemRenderer(std::shared_ptr<VulkanContext> ctx, std
     _currentTargetObjectID = _sun->getID();
     CameraParams cameraParams{};
     cameraParams.target = _sun->getPosition();
+    cameraParams.radius = glm::length(glm::vec3(0.f, 150.f, 130.f));
+    cameraParams.initialForward = glm::normalize(glm::vec3(0.f, -150.f, -130.f));
     _camera = std::make_unique<Camera>(cameraParams);
 }
 
@@ -646,6 +648,8 @@ void SolarSystemRenderer::buildUI()
     // Camera
     ImGui::Text(ICON_FA_CAMERA " Camera");
     ImGui::Indent(16.0f);
+        glm::vec3 camPos = _camera->getPosition();
+        ImGui::Text("Position  %.1f  %.1f  %.1f", camPos.x, camPos.y, camPos.z);
         float radius = _camera->getRadius();
         if (ImGui::SliderFloat("Distance", &radius, 5.0f, 500.0f))
             _camera->setRadius(radius);
