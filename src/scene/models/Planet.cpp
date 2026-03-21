@@ -2,11 +2,10 @@
 
 #include "scene/SolarSystemRenderer.h"
 
-Planet::Planet(std::shared_ptr<VulkanContext> ctx, 
-               std::string name, 
-               std::shared_ptr<DeviceMesh> mesh, 
+Planet::Planet(std::shared_ptr<VulkanContext> ctx,
+               std::string name,
+               std::shared_ptr<DeviceMesh> mesh,
                std::shared_ptr<Texture2D> baseColorTexture,
-               std::weak_ptr<Model> parent,
                float planetSize,
                float orbitRadius,
                float orbitAtT0,
@@ -16,7 +15,6 @@ Planet::Planet(std::shared_ptr<VulkanContext> ctx,
 
     : SelectableModel(ctx, std::move(name), std::move(mesh)),
     _baseColorTexture(std::move(baseColorTexture)),
-    _parent(std::move(parent)),
     _size(planetSize),
     _orbitRadius(orbitRadius),
     _orbitAtT0(orbitAtT0),
@@ -37,27 +35,19 @@ Planet::~Planet()
 }
 
 
-void Planet::calculateModelMatrix(float t)
+void Planet::computeLocalMatrix(float t)
 {
-    // Calculate position based on parent's position and orbit radius
-    glm::vec3 parentPosition = glm::vec3(0.0f);
-    if (auto parent = _parent.lock()) {
-        parentPosition = parent->getPosition();
-    }
-
-    // Calculate the new position based on the orbit radius and angle
-    glm::vec3 newPosition = parentPosition + glm::vec3(
+    // Orbit offset relative to parent origin
+    glm::vec3 localPos = glm::vec3(
         _orbitRadius * cos(-glm::radians(_orbitAtT0 + _orbitPerSec * t)),
         0.0f,
         _orbitRadius * sin(-glm::radians(_orbitAtT0 + _orbitPerSec * t))
     );
 
     glm::mat4 rotation90 = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
     glm::mat4 spin = glm::rotate(glm::mat4(1.0f), glm::radians(_spinAtT0 + _spinPerSec * t), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    // Update the model matrix
-    _modelMatrix = glm::translate(glm::mat4(1.0f), newPosition) * glm::scale(glm::mat4(1.0f), glm::vec3(_size)) * spin * rotation90;
+    _localMatrix = glm::translate(glm::mat4(1.0f), localPos) * glm::scale(glm::mat4(1.0f), glm::vec3(_size)) * spin * rotation90;
 }
 
 

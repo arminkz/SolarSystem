@@ -21,7 +21,6 @@ public:
           std::shared_ptr<Texture2D> normalMapTexture,
           std::shared_ptr<Texture2D> specularTexture,
           std::shared_ptr<Texture2D> overlayColorTexture,
-          std::weak_ptr<Model> parent,
           float planetSize,
           float orbitRadius,
           float orbitAtT0,

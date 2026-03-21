@@ -81,6 +81,7 @@ private:
     std::shared_ptr<Pipeline> _skyBoxPipeline;
     std::shared_ptr<Pipeline> _sunPipeline;
     std::shared_ptr<Pipeline> _earthPipeline;
+    std::shared_ptr<Pipeline> _ringPipeline;
 
     std::unique_ptr<Pipeline> _glowPipeline;
     std::unique_ptr<Pipeline> _blurVertPipeline;
@@ -92,11 +93,11 @@ private:
 
     // Drawables (Models)
     std::vector<std::shared_ptr<Planet>> _planets;
-    std::vector<std::unique_ptr<Orbit>> _orbits;
-    std::vector<std::unique_ptr<GlowSphere>> _glowSpheres;
+    std::vector<std::shared_ptr<Orbit>> _orbits;
+    std::vector<std::shared_ptr<GlowSphere>> _glowSpheres;
     std::unique_ptr<SkyBox> _skyBox;
     std::shared_ptr<Sun> _sun;
-    std::unique_ptr<GlowSphere> _sunGlowSphere;
+    std::shared_ptr<GlowSphere> _sunGlowSphere;
     std::shared_ptr<Earth> _earth;
     std::unordered_map<int, std::shared_ptr<SelectableModel>> _selectableObjects; // Selectable objects
     void createModels();

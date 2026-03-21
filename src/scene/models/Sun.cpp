@@ -19,11 +19,9 @@ Sun::~Sun()
 }
 
 
-void Sun::calculateModelMatrix()
+void Sun::computeLocalMatrix(float /*t*/)
 {
-    // Set the model matrix to identity for the sun
-    _modelMatrix = glm::mat4(1.0f);
-    _modelMatrix = glm::scale(_modelMatrix, glm::vec3(_size));
+    _localMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(_size));
 }
 
 

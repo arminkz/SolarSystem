@@ -13,10 +13,9 @@
 class GlowSphere : public Model
 {
 public:
-    GlowSphere(std::shared_ptr<VulkanContext> ctx, 
-               std::string name, 
+    GlowSphere(std::shared_ptr<VulkanContext> ctx,
+               std::string name,
                std::shared_ptr<DeviceMesh> mesh,
-               std::weak_ptr<Model> parent,
                glm::vec4 color,
                float coeffScatter = 3.0f,
                float powScatter = 3.0f,
@@ -29,11 +28,9 @@ public:
 
     const DescriptorSet* getDescriptorSet() const { return _descriptorSet.get(); }
 
-    void calculateModelMatrix();
+    void computeLocalMatrix(float t) override;
 
 private:
-
-    std::weak_ptr<Model> _parent;
     float _size = 1.0f;
 
     struct GlowSphereInfo {

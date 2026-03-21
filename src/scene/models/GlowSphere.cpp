@@ -2,16 +2,15 @@
 
 #include "scene/SolarSystemRenderer.h"
 
-GlowSphere::GlowSphere(std::shared_ptr<VulkanContext> ctx, 
-                         std::string name, 
+GlowSphere::GlowSphere(std::shared_ptr<VulkanContext> ctx,
+                         std::string name,
                          std::shared_ptr<DeviceMesh> mesh,
-                         std::weak_ptr<Model> parent,
                          glm::vec4 color,
                          float coeffScatter,
                          float powScatter,
                          float planetSize,
                          bool isLightSource)
-    : Model(ctx, std::move(name), std::move(mesh)), _parent(std::move(parent)), _size(planetSize)
+    : Model(ctx, std::move(name), std::move(mesh)), _size(planetSize)
 {
     _glowSphereInfo.color = color;
     _glowSphereInfo.coeffScatter = coeffScatter;
@@ -33,16 +32,9 @@ GlowSphere::~GlowSphere()
 }
 
 
-void GlowSphere::calculateModelMatrix()
+void GlowSphere::computeLocalMatrix(float /*t*/)
 {
-    // GlowSphere has the same position as the parent planet
-    glm::vec3 parentPosition = glm::vec3(0.0f);
-    if (auto parent = _parent.lock()) {
-        parentPosition = parent->getModelMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    }
-
-    // Update the model matrix
-    _modelMatrix = glm::translate(glm::mat4(1.0f), parentPosition) * glm::scale(glm::mat4(1.0f), glm::vec3(_size));
+    _localMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(_size));
 }
 
 

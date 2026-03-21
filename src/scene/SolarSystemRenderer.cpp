@@ -55,6 +55,7 @@ SolarSystemRenderer::~SolarSystemRenderer()
     _skyBoxPipeline = nullptr;
     _sunPipeline = nullptr;
     _earthPipeline = nullptr;
+    _ringPipeline = nullptr;
 
     _renderPass = nullptr;
     _offscreenRenderPass = nullptr;
@@ -222,10 +223,25 @@ void SolarSystemRenderer::createPipelines()
     planetPipelineParams.pushConstantRanges = {{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(glm::mat4)}};
     planetPipelineParams.renderPass = _offscreenRenderPassMSAA->getRenderPass();
     planetPipelineParams.msaaSamples = _msaaSamples;
-    _planetPipeline = std::make_unique<Pipeline>(_ctx, 
-        AssetPath::getInstance()->get("spv/planet/planet_vert.spv"), 
-        AssetPath::getInstance()->get("spv/planet/planet_frag.spv"), 
+    _planetPipeline = std::make_unique<Pipeline>(_ctx,
+        AssetPath::getInstance()->get("spv/planet/planet_vert.spv"),
+        AssetPath::getInstance()->get("spv/planet/planet_frag.spv"),
         planetPipelineParams);
+
+    // Ring pipeline (transparent, uses texture alpha)
+    PipelineParams ringPipelineParams;
+    ringPipelineParams.name = "RingPipeline";
+    ringPipelineParams.descriptorSetLayouts = {sceneDSL, _planets[0]->getDescriptorSet()->getDescriptorSetLayout()};
+    ringPipelineParams.pushConstantRanges = {{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(glm::mat4)}};
+    ringPipelineParams.renderPass = _offscreenRenderPassMSAA->getRenderPass();
+    ringPipelineParams.msaaSamples = _msaaSamples;
+    ringPipelineParams.blendEnable = true;
+    ringPipelineParams.depthWrite = false;
+    ringPipelineParams.cullMode = VK_CULL_MODE_NONE;
+    _ringPipeline = std::make_unique<Pipeline>(_ctx,
+        AssetPath::getInstance()->get("spv/ring/ring_vert.spv"),
+        AssetPath::getInstance()->get("spv/ring/ring_frag.spv"),
+        ringPipelineParams);
 
     // Orbit pipeline
     PipelineParams orbitPipelineParams;
@@ -330,9 +346,13 @@ void SolarSystemRenderer::connectPipelines()
         glowSphere->setPipeline(_glowSpherePipeline);
     }
 
-    // Earth and sun have their own pipelines
+    // Earth, sun and saturn ring have their own pipelines
     _sun->setPipeline(_sunPipeline);
     _earth->setPipeline(_earthPipeline);
+    for (const auto& planet : _planets) {
+        if (planet->getName() == "SaturnRing")
+            planet->setPipeline(_ringPipeline);
+    }
 }
 
 
@@ -364,20 +384,21 @@ void SolarSystemRenderer::createModels()
     std::shared_ptr<Texture2D> mercuryColorTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/mercury/8k_mercury.jpg"), 
         VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> mercury = std::make_shared<Planet>(_ctx, "Mercury", sphereDMesh, mercuryColorTexture, _sun, 
+    std::shared_ptr<Planet> mercury = std::make_shared<Planet>(_ctx, "Mercury", sphereDMesh, mercuryColorTexture,
         sizeMercury, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury, spinAtT0Mercury, spinSpeedMercury);
     _selectableObjects[mercury->getID()] = mercury;
-    _planets.push_back(std::move(mercury));
+    _planets.push_back(mercury);
 
     // Venus
     std::shared_ptr<Texture2D> venusColorTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/venus/4k_venus_atmosphere.jpg"), 
         VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> venus = std::make_shared<Planet>(_ctx, "Venus", sphereDMesh, venusColorTexture, _sun, 
+    std::shared_ptr<Planet> venus = std::make_shared<Planet>(_ctx, "Venus", sphereDMesh, venusColorTexture,
         sizeVenus, orbitRadVenus, orbitAtT0Venus, orbitSpeedVenus, spinAtT0Venus, spinSpeedVenus);
-    _glowSpheres.push_back(std::make_unique<GlowSphere>(_ctx, "VenusGlow", sphereDMesh, venus, glm::vec4(0.74f, 0.69f, 0.2f, 1.f), 3.f, 4.f, sizeVenus * 1.03f, false));
+    auto venusGlow = std::make_shared<GlowSphere>(_ctx, "VenusGlow", sphereDMesh, glm::vec4(0.74f, 0.69f, 0.2f, 1.f), 3.f, 4.f, sizeVenus * 1.03f, false);
+    _glowSpheres.push_back(venusGlow);
     _selectableObjects[venus->getID()] = venus;
-    _planets.push_back(std::move(venus));
+    _planets.push_back(venus);
 
     // Earth
     std::shared_ptr<Texture2D> colorTexture = std::make_shared<Texture2D>(_ctx, 
@@ -390,111 +411,108 @@ void SolarSystemRenderer::createModels()
         AssetPath::getInstance()->get("textures/earth/2k_earth_specular.jpeg"), VK_FORMAT_R8G8B8A8_UNORM);
     std::shared_ptr<Texture2D> overlayTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/earth/8k_earth_clouds.png"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Earth> earth = std::make_shared<Earth>(_ctx, "Earth", sphereDMesh, colorTexture, unlitTexture, normalTexture, specularTexture, overlayTexture, _sun,
+    std::shared_ptr<Earth> earth = std::make_shared<Earth>(_ctx, "Earth", sphereDMesh, colorTexture, unlitTexture, normalTexture, specularTexture, overlayTexture,
          sizeEarth, orbitRadEarth, orbitAtT0Earth, orbitSpeedEarth, spinAtT0Earth, spinSpeedEarth);
     _earth = earth;
-    _glowSpheres.push_back(std::make_unique<GlowSphere>(_ctx, "EarthGlow", sphereDMesh, _earth, glm::vec4(0.45f, 0.55f, 1.f, 1.f), 3.f, 4.f, sizeEarth * 1.03f, false));
+    auto earthGlow = std::make_shared<GlowSphere>(_ctx, "EarthGlow", sphereDMesh, glm::vec4(0.45f, 0.55f, 1.f, 1.f), 3.f, 4.f, sizeEarth * 1.03f, false);
+    _glowSpheres.push_back(earthGlow);
     _selectableObjects[earth->getID()] = earth;
-    _planets.push_back(std::move(earth));
+    _planets.push_back(earth);
 
     // Earth Moon
     std::shared_ptr<Texture2D> moonColorTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/moon/8k_moon.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> moon = std::make_shared<Planet>(_ctx, "Moon", sphereDMesh, moonColorTexture, _earth, 
+    std::shared_ptr<Planet> moon = std::make_shared<Planet>(_ctx, "Moon", sphereDMesh, moonColorTexture,
         sizeMoon, orbitRadMoon, orbitAtT0Moon, orbitSpeedMoon, spinAtT0Moon, spinSpeedMoon);
     _selectableObjects[moon->getID()] = moon;
-    _planets.push_back(std::move(moon));
+    _planets.push_back(moon);
 
     // Mars
     std::shared_ptr<Texture2D> marsColorTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/mars/8k_mars.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> mars = std::make_shared<Planet>(_ctx, "Mars", sphereDMesh, marsColorTexture, _sun,
+    std::shared_ptr<Planet> mars = std::make_shared<Planet>(_ctx, "Mars", sphereDMesh, marsColorTexture,
         sizeMars, orbitRadMars, orbitAtT0Mars, orbitSpeedMars, spinAtT0Mars, spinSpeedMars);
     _selectableObjects[mars->getID()] = mars;
-    _planets.push_back(std::move(mars));
+    _planets.push_back(mars);
 
     // Jupiter
     std::shared_ptr<Texture2D> jupiterColorTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/jupiter/4k_jupiter.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> jupiter = std::make_shared<Planet>(_ctx, "Jupiter", sphereDMesh, jupiterColorTexture, _sun, 
+    std::shared_ptr<Planet> jupiter = std::make_shared<Planet>(_ctx, "Jupiter", sphereDMesh, jupiterColorTexture,
         sizeJupiter, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter, spinAtT0Jupiter, spinSpeedJupiter);
     _selectableObjects[jupiter->getID()] = jupiter;
-    _planets.push_back(std::move(jupiter));
+    _planets.push_back(jupiter);
 
     // Saturn
     std::shared_ptr<Texture2D> saturnColorTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/saturn/8k_saturn.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> saturn = std::make_shared<Planet>(_ctx, "Saturn", sphereDMesh, saturnColorTexture, _sun,
+    std::shared_ptr<Planet> saturn = std::make_shared<Planet>(_ctx, "Saturn", sphereDMesh, saturnColorTexture,
         sizeSaturn, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, spinAtT0Saturn, spinSpeedSaturn);
     _selectableObjects[saturn->getID()] = saturn;
-    _planets.push_back(std::move(saturn));
+    _planets.push_back(saturn);
 
     // Saturn Ring
-    std::shared_ptr<Texture2D> ringTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> ringTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/saturn/8k_saturn_ring_alpha.png"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> saturn_ring = std::make_shared<Planet>(_ctx, "SaturnRing", ringDMesh, ringTexture, _sun, 
-        sizeSaturnRing, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, spinAtT0Saturn, spinSpeedSaturn);
-    _planets.push_back(std::move(saturn_ring));
+    std::shared_ptr<Planet> saturn_ring = std::make_shared<Planet>(_ctx, "SaturnRing", ringDMesh, ringTexture,
+        sizeSaturnRing, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, 0.f, 0.f);
+    _planets.push_back(saturn_ring);
 
     // Uranus
     std::shared_ptr<Texture2D> uranusColorTexture = std::make_shared<Texture2D>(_ctx, 
         AssetPath::getInstance()->get("textures/uranus/1k_uranus.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> uranus = std::make_shared<Planet>(_ctx, "Uranus", sphereDMesh, uranusColorTexture, _sun,
+    std::shared_ptr<Planet> uranus = std::make_shared<Planet>(_ctx, "Uranus", sphereDMesh, uranusColorTexture,
         sizeUranus, orbitRadUranus, orbitAtT0Uranus, orbitSpeedUranus, spinAtT0Uranus, spinSpeedUranus);
     _selectableObjects[uranus->getID()] = uranus;
-    _planets.push_back(std::move(uranus));
+    _planets.push_back(uranus);
 
     // Neptune
-    std::shared_ptr<Texture2D> neptuneColorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> neptuneColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/neptune/2k_neptune.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> neptune = std::make_shared<Planet>(_ctx, "Neptune", sphereDMesh, neptuneColorTexture, _sun, 
+    std::shared_ptr<Planet> neptune = std::make_shared<Planet>(_ctx, "Neptune", sphereDMesh, neptuneColorTexture,
         sizeNeptune, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune, spinAtT0Neptune, spinSpeedNeptune);
     _selectableObjects[neptune->getID()] = neptune;
-    _planets.push_back(std::move(neptune));
+    _planets.push_back(neptune);
 
     // Pluto
-    std::shared_ptr<Texture2D> plutoColorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> plutoColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/pluto/2k_pluto.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Planet> pluto = std::make_shared<Planet>(_ctx, "Pluto", sphereDMesh, plutoColorTexture, _sun,
+    std::shared_ptr<Planet> pluto = std::make_shared<Planet>(_ctx, "Pluto", sphereDMesh, plutoColorTexture,
         sizePluto, orbitRadPluto, orbitAtT0Pluto, orbitSpeedPluto, spinAtT0Pluto, spinSpeedPluto);
     _selectableObjects[pluto->getID()] = pluto;
-    _planets.push_back(std::move(pluto));
+    _planets.push_back(pluto);
 
 
-    // Mercury Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "MercuryOrbit", quadDMesh, _sun, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury));
+    auto mercuryOrbit = std::make_shared<Orbit>(_ctx, "MercuryOrbit", quadDMesh, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury);
+    auto venusOrbit   = std::make_shared<Orbit>(_ctx, "VenusOrbit",   quadDMesh, orbitRadVenus,   orbitAtT0Venus,   orbitSpeedVenus);
+    auto earthOrbit   = std::make_shared<Orbit>(_ctx, "EarthOrbit",   quadDMesh, orbitRadEarth,   orbitAtT0Earth,   orbitSpeedEarth);
+    auto moonOrbit    = std::make_shared<Orbit>(_ctx, "MoonOrbit",    quadDMesh, orbitRadMoon,    orbitAtT0Moon,    orbitSpeedMoon);
+    auto marsOrbit    = std::make_shared<Orbit>(_ctx, "MarsOrbit",    quadDMesh, orbitRadMars,    orbitAtT0Mars,    orbitSpeedMars);
+    auto jupiterOrbit = std::make_shared<Orbit>(_ctx, "JupiterOrbit", quadDMesh, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter);
+    auto saturnOrbit  = std::make_shared<Orbit>(_ctx, "SaturnOrbit",  quadDMesh, orbitRadSaturn,  orbitAtT0Saturn,  orbitSpeedSaturn);
+    auto uranusOrbit  = std::make_shared<Orbit>(_ctx, "UranusOrbit",  quadDMesh, orbitRadUranus,  orbitAtT0Uranus,  orbitSpeedUranus);
+    auto neptuneOrbit = std::make_shared<Orbit>(_ctx, "NeptuneOrbit", quadDMesh, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune);
+    auto plutoOrbit   = std::make_shared<Orbit>(_ctx, "PlutoOrbit",   quadDMesh, orbitRadPluto,   orbitAtT0Pluto,   orbitSpeedPluto);
+    _orbits = { mercuryOrbit, venusOrbit, earthOrbit, moonOrbit, marsOrbit,
+                jupiterOrbit, saturnOrbit, uranusOrbit, neptuneOrbit, plutoOrbit };
 
-    // Venus Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "VenusOrbit", quadDMesh, _sun, orbitRadVenus, orbitAtT0Venus, orbitSpeedVenus));
+    _sunGlowSphere = std::make_shared<GlowSphere>(_ctx, "SunGlow", sphereDMesh, glm::vec4(1.f, 0.4f, 0.0f, 0.4f), 0.5f, 3.0f, sizeSun * 2.f, true);
 
-    // Earth Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "EarthOrbit", quadDMesh, _sun, orbitRadEarth, orbitAtT0Earth, orbitSpeedEarth));
-
-    // Moon Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "MoonOrbit", quadDMesh, _earth, orbitRadMoon, orbitAtT0Moon, orbitSpeedMoon));
-
-    // Mars Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "MarsOrbit", quadDMesh, _sun, orbitRadMars, orbitAtT0Mars, orbitSpeedMars));
-
-    // Jupiter Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "JupiterOrbit", quadDMesh, _sun, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter));
-
-    // Saturn Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "SaturnOrbit", quadDMesh, _sun, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn));
-
-    // Uranus Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "UranusOrbit", quadDMesh, _sun, orbitRadUranus, orbitAtT0Uranus, orbitSpeedUranus));
-
-    // Neptune Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "NeptuneOrbit", quadDMesh, _sun, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune));
-
-    // Pluto Orbit
-    _orbits.push_back(std::make_unique<Orbit>(_ctx, "PlutoOrbit", quadDMesh, _sun, orbitRadPluto, orbitAtT0Pluto, orbitSpeedPluto));
-
-
-    // Glow spheres
-    _sunGlowSphere = std::make_unique<GlowSphere>(_ctx, "SunGlow", sphereDMesh, _sun, glm::vec4(1.f, 0.4f, 0.0f, 0.4f), 0.5f, 3.0f, sizeSun * 2.f, true);
-    //TODO: need to expose these parameters in the UI
+    // Wire scene graph hierarchy
+    _sun->addChild(_sunGlowSphere);
+    _sun->addChild(mercuryOrbit);   _sun->addChild(_planets[0]);  // mercury
+    _sun->addChild(venusOrbit);     _sun->addChild(_planets[1]);  // venus
+    venus->addChild(venusGlow);
+    _sun->addChild(earthOrbit);     _sun->addChild(_earth);
+    _earth->addChild(earthGlow);
+    _earth->addChild(moonOrbit);    _earth->addChild(_planets[3]); // moon
+    _sun->addChild(marsOrbit);      _sun->addChild(_planets[4]);   // mars
+    _sun->addChild(jupiterOrbit);   _sun->addChild(_planets[5]);   // jupiter
+    _sun->addChild(saturnOrbit);    _sun->addChild(_planets[6]);   // saturn
+    _sun->addChild(_planets[7]);    // saturn ring (same orbit as saturn)
+    _sun->addChild(uranusOrbit);    _sun->addChild(_planets[8]);   // uranus
+    _sun->addChild(neptuneOrbit);   _sun->addChild(_planets[9]);   // neptune
+    _sun->addChild(plutoOrbit);     _sun->addChild(_planets[10]);  // pluto
 }
 
 
@@ -686,18 +704,8 @@ void SolarSystemRenderer::update(uint32_t currentImage)
 
     VkExtent2D swapChainExtent = _swapChain->getSwapChainExtent();
 
-    // Update the planet positions
-    _sun->calculateModelMatrix();
-    for (const auto& planet : _planets) {
-        planet->calculateModelMatrix(_sceneInfo.time * 2000.f);
-    }
-    for (const auto& orbit : _orbits) {
-        orbit->calculateModelMatrix(_sceneInfo.time * 2000.f);
-    }
-    _sunGlowSphere->calculateModelMatrix();
-    for (const auto& glowSphere : _glowSpheres) {
-        glowSphere->calculateModelMatrix();
-    }
+    // Propagate transforms top-down through scene graph
+    _sun->propagate(_sceneInfo.time * 2000.f);
 
     // Update camera position based on time
     _camera->setTarget(_selectableObjects[_currentTargetObjectID]->getPosition());

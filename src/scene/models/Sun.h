@@ -21,7 +21,7 @@ public:
     void draw(VkCommandBuffer commandBuffer, const Renderer& renderer) override;
     void drawSelection(VkCommandBuffer commandBuffer, const Renderer& renderer) override;
 
-    void calculateModelMatrix();
+    void computeLocalMatrix(float t) override;
 
     // Used in Bloom effect
     const glm::vec3 glowColor = glm::vec3(1.f, 0.3f, 0.0f);

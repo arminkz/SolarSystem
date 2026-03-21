@@ -148,22 +148,22 @@ namespace MeshFactory {
             float cosA = std::cos(angle);
             float sinA = std::sin(angle);
 
-            // Outer vertex
+            // Outer vertex (XY plane so Planet's Rx(-90°) rotates it flat into XZ)
             Vertex outerVertex;
-            outerVertex.pos = { cosA * outerRadius, 0.0f, sinA * outerRadius };
+            outerVertex.pos = { cosA * outerRadius, sinA * outerRadius, 0.0f };
             outerVertex.color = glm::vec4(1.f);
-            outerVertex.texCoord = {  1.0f, static_cast<float>(i) / segments };
-            outerVertex.normal = glm::vec3(0, 1, 0);
-            outerVertex.tangent = glm::vec3(-sinA, 0.0f, cosA); // Tangent is perpendicular to the normal
+            outerVertex.texCoord = { 1.0f, static_cast<float>(i) / segments };
+            outerVertex.normal = glm::vec3(0, 0, 1);
+            outerVertex.tangent = glm::vec3(-sinA, cosA, 0.0f);
             mesh.vertices.push_back(outerVertex);
 
             // Inner vertex
             Vertex innerVertex;
-            innerVertex.pos = { cosA * innerRadius, 0.0f, sinA * innerRadius };
+            innerVertex.pos = { cosA * innerRadius, sinA * innerRadius, 0.0f };
             innerVertex.color = glm::vec4(1.f);
             innerVertex.texCoord = { 0.0f, static_cast<float>(i) / segments };
-            innerVertex.normal = glm::vec3(0, 1, 0);
-            innerVertex.tangent = glm::vec3(-sinA, 0.0f, cosA); // Tangent is perpendicular to the normal
+            innerVertex.normal = glm::vec3(0, 0, 1);
+            innerVertex.tangent = glm::vec3(-sinA, cosA, 0.0f);
             mesh.vertices.push_back(innerVertex);
 
         }

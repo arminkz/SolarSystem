@@ -11,10 +11,9 @@
 class Orbit : public Model
 {
 public:
-    Orbit(std::shared_ptr<VulkanContext> ctx, 
-          std::string name, 
+    Orbit(std::shared_ptr<VulkanContext> ctx,
+          std::string name,
           std::shared_ptr<DeviceMesh> mesh,
-          std::weak_ptr<Model> parent,
           float orbitSize,
           float orbitAtT0,
           float orbitPerSec);
@@ -23,12 +22,9 @@ public:
 
     void draw(VkCommandBuffer commandBuffer, const Renderer& renderer) override;
 
-    void calculateModelMatrix(float t);
+    void computeLocalMatrix(float t) override;
 
 protected:
-
-    std::weak_ptr<Model> _parent; // Weak pointer to parent planet (if any)
-    
     float _orbitSize = 1.0f;           // Used for scaling the model
     float _orbitAtT0 = 0.0f;           // Initial orbit angle
     float _orbitPerSec = 0.0f;         // Orbit speed
