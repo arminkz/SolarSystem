@@ -50,9 +50,12 @@ private:
     std::array<std::unique_ptr<DescriptorSet>, MAX_FRAMES_IN_FLIGHT> _sceneDescriptorSets;
 
     // Time
+    float _timeScale = 1.0f;
     bool _isPaused = false;
-    bool _showUI = true;
     TimePoint _lastFrameTime = std::chrono::high_resolution_clock::now();
+
+    // UI state
+    bool _showUI = false;
 
     // Camera
     std::unique_ptr<Camera> _camera = nullptr;
@@ -144,17 +147,18 @@ private:
     const float sizeNeptune = 0.4f;
     const float sizePluto = 0.2f;
 
-    // Orbit Radii
-    const float orbitRadMercury = 20.f;
-    const float orbitRadVenus = 26.f;
-    const float orbitRadEarth = 32.f;
-    const float orbitRadMoon = 2.f;
-    const float orbitRadMars = 44.f;
-    const float orbitRadJupiter = 94.f;
-    const float orbitRadSaturn = 154.f;
-    const float orbitRadUranus = 238.f;
-    const float orbitRadNeptune = 278.f;
-    const float orbitRadPluto = 310.f;
+    // Orbit Radii (visually compressed — real scale would push outer planets off-screen)
+    // Inner planets are tightly packed; large gap after Mars represents the asteroid belt
+    const float orbitRadMercury =  16.f;
+    const float orbitRadVenus   =  24.f;
+    const float orbitRadEarth   =  34.f;
+    const float orbitRadMoon    =   2.f;
+    const float orbitRadMars    =  44.f;
+    const float orbitRadJupiter =  90.f;  // ~46 unit gap after Mars
+    const float orbitRadSaturn  = 126.f;
+    const float orbitRadUranus  = 160.f;
+    const float orbitRadNeptune = 192.f;
+    const float orbitRadPluto   = 218.f;
 
     // Angle offset (t = 0)
     const float orbitAtT0Mercury = 252.25f;
@@ -192,17 +196,30 @@ private:
     const float spinAtT0Neptune = 30.07f;
     const float spinAtT0Pluto = 122.53f;
 
-    // Spin speed (degrees per second)
-    const float spinSpeedMercury = 0.007f;
-    const float spinSpeedVenus = -0.0017f;
-    const float spinSpeedEarth = 0.041f;
-    const float spinSpeedMoon = 0.0159f;
-    const float spinSpeedMars = 0.40f;
-    const float spinSpeedJupiter = 1.0096f;
-    const float spinSpeedSaturn = 0.9397f;
-    const float spinSpeedUranus = -0.6f;
-    const float spinSpeedNeptune = 0.62f;
-    const float spinSpeedPluto = -0.26f;
+    // Spin speed (degrees per second), scaled to match orbital speed ratio.
+    // spinSpeed = orbitSpeed * (orbitalPeriodDays / siderealRotationDays)
+    const float spinSpeedMercury =  0.006f;    // 87.97d orbit / 58.646d rotation
+    const float spinSpeedVenus   = -0.0015f;   // retrograde: 224.70d / 243.0d
+    const float spinSpeedEarth   =  0.329f;    // 365.25d / 1.0d
+    const float spinSpeedMoon    =  0.01f;     // tidally locked: 27.32d / 27.32d
+    const float spinSpeedMars    =  0.335f;    // 686.97d / 1.026d
+    const float spinSpeedJupiter =  0.838f;    // 4332.6d / 0.4135d
+    const float spinSpeedSaturn  =  0.727f;    // 10759d / 0.444d
+    const float spinSpeedUranus  = -0.427f;    // retrograde: 30687d / 0.718d
+    const float spinSpeedNeptune =  0.538f;    // 60190d / 0.671d
+    const float spinSpeedPluto   = -0.057f;    // retrograde: 90560d / 6.387d
+
+    // Orbital inclination relative to the ecliptic (degrees)
+    const float orbitInclinationMercury =  7.00f;
+    const float orbitInclinationVenus   =  3.39f;
+    const float orbitInclinationEarth   =  0.00f;
+    const float orbitInclinationMoon    =  5.14f;
+    const float orbitInclinationMars    =  1.85f;
+    const float orbitInclinationJupiter =  1.30f;
+    const float orbitInclinationSaturn  =  2.49f;
+    const float orbitInclinationUranus  =  0.77f;
+    const float orbitInclinationNeptune =  1.77f;
+    const float orbitInclinationPluto   = 17.14f;
 
 
     //Misc

@@ -7,11 +7,13 @@ Orbit::Orbit(std::shared_ptr<VulkanContext> ctx,
              std::shared_ptr<DeviceMesh> mesh,
              float orbitSize,
              float orbitAtT0,
-             float orbitPerSec)
+             float orbitPerSec,
+             float orbitInclination)
     : Model(ctx, std::move(name), std::move(mesh)),
       _orbitSize(orbitSize),
       _orbitAtT0(orbitAtT0),
-      _orbitPerSec(orbitPerSec)
+      _orbitPerSec(orbitPerSec),
+      _orbitInclination(orbitInclination)
 {
 }
 
@@ -26,7 +28,8 @@ void Orbit::computeLocalMatrix(float t)
 {
     glm::mat4 spin = glm::rotate(glm::mat4(1.0f), glm::radians(_orbitAtT0 + _orbitPerSec * t), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(_orbitSize * 2.0f));
-    _localMatrix = scale * spin;
+    glm::mat4 tilt = glm::rotate(glm::mat4(1.0f), glm::radians(_orbitInclination), glm::vec3(1.0f, 0.0f, 0.0f));
+    _localMatrix = tilt * scale * spin;
 }
 
 

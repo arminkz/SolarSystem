@@ -385,34 +385,34 @@ void SolarSystemRenderer::createModels()
         AssetPath::getInstance()->get("textures/mercury/8k_mercury.jpg"), 
         VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> mercury = std::make_shared<Planet>(_ctx, "Mercury", sphereDMesh, mercuryColorTexture,
-        sizeMercury, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury, spinAtT0Mercury, spinSpeedMercury);
+        sizeMercury, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury, spinAtT0Mercury, spinSpeedMercury, orbitInclinationMercury);
     _selectableObjects[mercury->getID()] = mercury;
     _planets.push_back(mercury);
 
     // Venus
-    std::shared_ptr<Texture2D> venusColorTexture = std::make_shared<Texture2D>(_ctx, 
-        AssetPath::getInstance()->get("textures/venus/4k_venus_atmosphere.jpg"), 
+    std::shared_ptr<Texture2D> venusColorTexture = std::make_shared<Texture2D>(_ctx,
+        AssetPath::getInstance()->get("textures/venus/4k_venus_atmosphere.jpg"),
         VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> venus = std::make_shared<Planet>(_ctx, "Venus", sphereDMesh, venusColorTexture,
-        sizeVenus, orbitRadVenus, orbitAtT0Venus, orbitSpeedVenus, spinAtT0Venus, spinSpeedVenus);
+        sizeVenus, orbitRadVenus, orbitAtT0Venus, orbitSpeedVenus, spinAtT0Venus, spinSpeedVenus, orbitInclinationVenus);
     auto venusGlow = std::make_shared<GlowSphere>(_ctx, "VenusGlow", sphereDMesh, glm::vec4(0.74f, 0.69f, 0.2f, 1.f), 3.f, 4.f, sizeVenus * 1.03f, false);
     _glowSpheres.push_back(venusGlow);
     _selectableObjects[venus->getID()] = venus;
     _planets.push_back(venus);
 
     // Earth
-    std::shared_ptr<Texture2D> colorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> colorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/earth/10k_earth_day.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Texture2D> unlitTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> unlitTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/earth/10k_earth_night.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Texture2D> normalTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> normalTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/earth/2k_earth_normal.png"), VK_FORMAT_R8G8B8A8_UNORM);
-    std::shared_ptr<Texture2D> specularTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> specularTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/earth/2k_earth_specular.jpeg"), VK_FORMAT_R8G8B8A8_UNORM);
-    std::shared_ptr<Texture2D> overlayTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> overlayTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/earth/8k_earth_clouds.png"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Earth> earth = std::make_shared<Earth>(_ctx, "Earth", sphereDMesh, colorTexture, unlitTexture, normalTexture, specularTexture, overlayTexture,
-         sizeEarth, orbitRadEarth, orbitAtT0Earth, orbitSpeedEarth, spinAtT0Earth, spinSpeedEarth);
+         sizeEarth, orbitRadEarth, orbitAtT0Earth, orbitSpeedEarth, spinAtT0Earth, spinSpeedEarth, orbitInclinationEarth);
     _earth = earth;
     auto earthGlow = std::make_shared<GlowSphere>(_ctx, "EarthGlow", sphereDMesh, glm::vec4(0.45f, 0.55f, 1.f, 1.f), 3.f, 4.f, sizeEarth * 1.03f, false);
     _glowSpheres.push_back(earthGlow);
@@ -420,34 +420,34 @@ void SolarSystemRenderer::createModels()
     _planets.push_back(earth);
 
     // Earth Moon
-    std::shared_ptr<Texture2D> moonColorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> moonColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/moon/8k_moon.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> moon = std::make_shared<Planet>(_ctx, "Moon", sphereDMesh, moonColorTexture,
-        sizeMoon, orbitRadMoon, orbitAtT0Moon, orbitSpeedMoon, spinAtT0Moon, spinSpeedMoon);
+        sizeMoon, orbitRadMoon, orbitAtT0Moon, orbitSpeedMoon, spinAtT0Moon, spinSpeedMoon, orbitInclinationMoon);
     _selectableObjects[moon->getID()] = moon;
     _planets.push_back(moon);
 
     // Mars
-    std::shared_ptr<Texture2D> marsColorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> marsColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/mars/8k_mars.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> mars = std::make_shared<Planet>(_ctx, "Mars", sphereDMesh, marsColorTexture,
-        sizeMars, orbitRadMars, orbitAtT0Mars, orbitSpeedMars, spinAtT0Mars, spinSpeedMars);
+        sizeMars, orbitRadMars, orbitAtT0Mars, orbitSpeedMars, spinAtT0Mars, spinSpeedMars, orbitInclinationMars);
     _selectableObjects[mars->getID()] = mars;
     _planets.push_back(mars);
 
     // Jupiter
-    std::shared_ptr<Texture2D> jupiterColorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> jupiterColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/jupiter/4k_jupiter.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> jupiter = std::make_shared<Planet>(_ctx, "Jupiter", sphereDMesh, jupiterColorTexture,
-        sizeJupiter, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter, spinAtT0Jupiter, spinSpeedJupiter);
+        sizeJupiter, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter, spinAtT0Jupiter, spinSpeedJupiter, orbitInclinationJupiter);
     _selectableObjects[jupiter->getID()] = jupiter;
     _planets.push_back(jupiter);
 
     // Saturn
-    std::shared_ptr<Texture2D> saturnColorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> saturnColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/saturn/8k_saturn.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> saturn = std::make_shared<Planet>(_ctx, "Saturn", sphereDMesh, saturnColorTexture,
-        sizeSaturn, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, spinAtT0Saturn, spinSpeedSaturn);
+        sizeSaturn, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, spinAtT0Saturn, spinSpeedSaturn, orbitInclinationSaturn);
     _selectableObjects[saturn->getID()] = saturn;
     _planets.push_back(saturn);
 
@@ -455,14 +455,14 @@ void SolarSystemRenderer::createModels()
     std::shared_ptr<Texture2D> ringTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/saturn/8k_saturn_ring_alpha.png"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> saturn_ring = std::make_shared<Planet>(_ctx, "SaturnRing", ringDMesh, ringTexture,
-        sizeSaturnRing, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, 0.f, 0.f);
+        sizeSaturnRing, orbitRadSaturn, orbitAtT0Saturn, orbitSpeedSaturn, 0.f, 0.f, orbitInclinationSaturn);
     _planets.push_back(saturn_ring);
 
     // Uranus
-    std::shared_ptr<Texture2D> uranusColorTexture = std::make_shared<Texture2D>(_ctx, 
+    std::shared_ptr<Texture2D> uranusColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/uranus/1k_uranus.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> uranus = std::make_shared<Planet>(_ctx, "Uranus", sphereDMesh, uranusColorTexture,
-        sizeUranus, orbitRadUranus, orbitAtT0Uranus, orbitSpeedUranus, spinAtT0Uranus, spinSpeedUranus);
+        sizeUranus, orbitRadUranus, orbitAtT0Uranus, orbitSpeedUranus, spinAtT0Uranus, spinSpeedUranus, orbitInclinationUranus);
     _selectableObjects[uranus->getID()] = uranus;
     _planets.push_back(uranus);
 
@@ -470,7 +470,7 @@ void SolarSystemRenderer::createModels()
     std::shared_ptr<Texture2D> neptuneColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/neptune/2k_neptune.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> neptune = std::make_shared<Planet>(_ctx, "Neptune", sphereDMesh, neptuneColorTexture,
-        sizeNeptune, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune, spinAtT0Neptune, spinSpeedNeptune);
+        sizeNeptune, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune, spinAtT0Neptune, spinSpeedNeptune, orbitInclinationNeptune);
     _selectableObjects[neptune->getID()] = neptune;
     _planets.push_back(neptune);
 
@@ -478,21 +478,21 @@ void SolarSystemRenderer::createModels()
     std::shared_ptr<Texture2D> plutoColorTexture = std::make_shared<Texture2D>(_ctx,
         AssetPath::getInstance()->get("textures/pluto/2k_pluto.jpg"), VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Planet> pluto = std::make_shared<Planet>(_ctx, "Pluto", sphereDMesh, plutoColorTexture,
-        sizePluto, orbitRadPluto, orbitAtT0Pluto, orbitSpeedPluto, spinAtT0Pluto, spinSpeedPluto);
+        sizePluto, orbitRadPluto, orbitAtT0Pluto, orbitSpeedPluto, spinAtT0Pluto, spinSpeedPluto, orbitInclinationPluto);
     _selectableObjects[pluto->getID()] = pluto;
     _planets.push_back(pluto);
 
 
-    auto mercuryOrbit = std::make_shared<Orbit>(_ctx, "MercuryOrbit", quadDMesh, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury);
-    auto venusOrbit   = std::make_shared<Orbit>(_ctx, "VenusOrbit",   quadDMesh, orbitRadVenus,   orbitAtT0Venus,   orbitSpeedVenus);
-    auto earthOrbit   = std::make_shared<Orbit>(_ctx, "EarthOrbit",   quadDMesh, orbitRadEarth,   orbitAtT0Earth,   orbitSpeedEarth);
-    auto moonOrbit    = std::make_shared<Orbit>(_ctx, "MoonOrbit",    quadDMesh, orbitRadMoon,    orbitAtT0Moon,    orbitSpeedMoon);
-    auto marsOrbit    = std::make_shared<Orbit>(_ctx, "MarsOrbit",    quadDMesh, orbitRadMars,    orbitAtT0Mars,    orbitSpeedMars);
-    auto jupiterOrbit = std::make_shared<Orbit>(_ctx, "JupiterOrbit", quadDMesh, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter);
-    auto saturnOrbit  = std::make_shared<Orbit>(_ctx, "SaturnOrbit",  quadDMesh, orbitRadSaturn,  orbitAtT0Saturn,  orbitSpeedSaturn);
-    auto uranusOrbit  = std::make_shared<Orbit>(_ctx, "UranusOrbit",  quadDMesh, orbitRadUranus,  orbitAtT0Uranus,  orbitSpeedUranus);
-    auto neptuneOrbit = std::make_shared<Orbit>(_ctx, "NeptuneOrbit", quadDMesh, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune);
-    auto plutoOrbit   = std::make_shared<Orbit>(_ctx, "PlutoOrbit",   quadDMesh, orbitRadPluto,   orbitAtT0Pluto,   orbitSpeedPluto);
+    auto mercuryOrbit = std::make_shared<Orbit>(_ctx, "MercuryOrbit", quadDMesh, orbitRadMercury, orbitAtT0Mercury, orbitSpeedMercury, orbitInclinationMercury);
+    auto venusOrbit   = std::make_shared<Orbit>(_ctx, "VenusOrbit",   quadDMesh, orbitRadVenus,   orbitAtT0Venus,   orbitSpeedVenus,   orbitInclinationVenus);
+    auto earthOrbit   = std::make_shared<Orbit>(_ctx, "EarthOrbit",   quadDMesh, orbitRadEarth,   orbitAtT0Earth,   orbitSpeedEarth,   orbitInclinationEarth);
+    auto moonOrbit    = std::make_shared<Orbit>(_ctx, "MoonOrbit",    quadDMesh, orbitRadMoon,    orbitAtT0Moon,    orbitSpeedMoon,    orbitInclinationMoon);
+    auto marsOrbit    = std::make_shared<Orbit>(_ctx, "MarsOrbit",    quadDMesh, orbitRadMars,    orbitAtT0Mars,    orbitSpeedMars,    orbitInclinationMars);
+    auto jupiterOrbit = std::make_shared<Orbit>(_ctx, "JupiterOrbit", quadDMesh, orbitRadJupiter, orbitAtT0Jupiter, orbitSpeedJupiter, orbitInclinationJupiter);
+    auto saturnOrbit  = std::make_shared<Orbit>(_ctx, "SaturnOrbit",  quadDMesh, orbitRadSaturn,  orbitAtT0Saturn,  orbitSpeedSaturn,  orbitInclinationSaturn);
+    auto uranusOrbit  = std::make_shared<Orbit>(_ctx, "UranusOrbit",  quadDMesh, orbitRadUranus,  orbitAtT0Uranus,  orbitSpeedUranus,  orbitInclinationUranus);
+    auto neptuneOrbit = std::make_shared<Orbit>(_ctx, "NeptuneOrbit", quadDMesh, orbitRadNeptune, orbitAtT0Neptune, orbitSpeedNeptune, orbitInclinationNeptune);
+    auto plutoOrbit   = std::make_shared<Orbit>(_ctx, "PlutoOrbit",   quadDMesh, orbitRadPluto,   orbitAtT0Pluto,   orbitSpeedPluto,   orbitInclinationPluto);
     _orbits = { mercuryOrbit, venusOrbit, earthOrbit, moonOrbit, marsOrbit,
                 jupiterOrbit, saturnOrbit, uranusOrbit, neptuneOrbit, plutoOrbit };
 
@@ -638,55 +638,130 @@ void SolarSystemRenderer::createFrameBuffers() {
 
 void SolarSystemRenderer::buildUI()
 {
-    if (!_showUI) return;
+    // HUD — borderless, pinned top-center
+    ImVec2 hudPos(ImGui::GetIO().DisplaySize.x * 0.5f, 12.0f);
+    ImGui::SetNextWindowPos(hudPos, ImGuiCond_Always, ImVec2(0.5f, 0.0f));
+    ImGui::SetNextWindowBgAlpha(0.0f);
+    static bool pauseHovered = false, rewindHovered = false, fwdHovered = false, cogHovered = false;
+    const ImVec4 colDefault(1, 1, 1, 0.45f);
+    const ImVec4 colHot    (1, 1, 1, 1.00f);
 
-    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(280, 0), ImGuiCond_Once);
-    ImGui::Begin("Solar System", &_showUI);
+    // Unified speed table: negative = reverse, positive = forward
+    static const std::pair<const char*, float> speeds[] = {
+        {"-100x",-100.0f},
+        {"-20x", -20.0f},
+        {"-10x", -10.0f},
+        {"-5x",  -5.0f},
+        {"-1x",  -1.0f},
+        {"1x",    1.0f},
+        {"5x",    5.0f},
+        {"10x",   10.0f},
+        {"20x",   20.0f},
+        {"100x",  100.0f},
+    };
+    static constexpr int speedCount = 10;
+    static int speedIndex = 5; // default: 1x
 
-    ImGui::Text(ICON_FA_TACHOMETER_ALT " %.1f FPS  (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+    ImGui::PushStyleColor(ImGuiCol_Border,        ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0, 0, 0, 0));
+    ImGui::Begin("##hud", nullptr,
+        ImGuiWindowFlags_NoDecoration      |
+        ImGuiWindowFlags_NoMove            |
+        ImGuiWindowFlags_AlwaysAutoResize  |
+        ImGuiWindowFlags_NoSavedSettings   |
+        ImGuiWindowFlags_NoFocusOnAppearing|
+        ImGuiWindowFlags_NoNav);
 
-    ImGui::Separator();
-
-    ImGui::Text(ICON_FA_FILM " Scene");
-    ImGui::Indent(16.0f);
-
-    if (ImGui::Button(_isPaused ? ICON_FA_PLAY " Resume" : ICON_FA_PAUSE " Pause"))
-        _isPaused = !_isPaused;
+    ImGui::BeginDisabled(true);
+    ImGui::PushStyleColor(ImGuiCol_TextDisabled, colDefault);
+    ImGui::Button(speeds[speedIndex].first);
+    ImGui::PopStyleColor();
+    ImGui::EndDisabled();
 
     ImGui::SameLine();
 
-    if (ImGui::Button(ICON_FA_REDO " Reset"))
-        _sceneInfo.time = 0.0f;
+    ImGui::PushStyleColor(ImGuiCol_Text, rewindHovered ? colHot : colDefault);
+    if (ImGui::Button(ICON_FA_FAST_BACKWARD)) {
+        speedIndex = std::max(speedIndex - 1, 0);
+        _timeScale = speeds[speedIndex].second;
+    }
+    rewindHovered = ImGui::IsItemHovered();
+    ImGui::PopStyleColor();
 
-    ImGui::Unindent(16.0f);
+    ImGui::SameLine();
 
-    ImGui::Separator();
+    ImGui::PushStyleColor(ImGuiCol_Text, pauseHovered ? colHot : colDefault);
+    if (ImGui::Button(_isPaused ? ICON_FA_PLAY : ICON_FA_PAUSE))
+        _isPaused = !_isPaused;
+    pauseHovered = ImGui::IsItemHovered();
+    ImGui::PopStyleColor();
 
-    // Camera
-    ImGui::Text(ICON_FA_CAMERA " Camera");
-    ImGui::Indent(16.0f);
-        glm::vec3 camPos = _camera->getPosition();
-        ImGui::Text("Position  %.1f  %.1f  %.1f", camPos.x, camPos.y, camPos.z);
-        float radius = _camera->getRadius();
-        if (ImGui::SliderFloat("Distance", &radius, 5.0f, 500.0f))
-            _camera->setRadius(radius);
-    ImGui::Unindent(16.0f);
+    ImGui::SameLine();
 
-    ImGui::Separator();
+    ImGui::PushStyleColor(ImGuiCol_Text, fwdHovered ? colHot : colDefault);
+    if (ImGui::Button(ICON_FA_FAST_FORWARD)) {
+        speedIndex = std::min(speedIndex + 1, speedCount - 1);
+        _timeScale = speeds[speedIndex].second;
+    }
+    fwdHovered = ImGui::IsItemHovered();
+    ImGui::PopStyleColor();
 
-    // Bloom / Blur
-    ImGui::Text(ICON_FA_SUN " Bloom");
-    ImGui::Indent(16.0f);
-        bool changed = false;
-        changed |= ImGui::SliderFloat("Scale",    &blurSettings.blurScale,    0.1f, 10.0f);
-        changed |= ImGui::SliderFloat("Strength", &blurSettings.blurStrength, 0.0f,  5.0f);
-        if (changed)
-            _blurSettingsUBO->copyData(&blurSettings, sizeof(blurSettings));
-    ImGui::Unindent(16.0f);
+    ImGui::SameLine();
 
+    ImGui::PushStyleColor(ImGuiCol_Text, cogHovered ? colHot : colDefault);
+    if (ImGui::Button(ICON_FA_COG))
+        _showUI = !_showUI;
+    cogHovered = ImGui::IsItemHovered();
+    ImGui::PopStyleColor();
 
     ImGui::End();
+    ImGui::PopStyleColor(4);
+
+    if (_showUI) {
+        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(280, 0), ImGuiCond_Once);
+        ImGui::Begin("Options", &_showUI, ImGuiWindowFlags_NoCollapse);
+
+        ImGui::Text(ICON_FA_TACHOMETER_ALT " %.1f FPS  (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+
+        ImGui::Separator();
+
+        ImGui::Text(ICON_FA_FILM " Scene");
+        ImGui::Indent(16.0f);
+
+        if (ImGui::Button(ICON_FA_REDO " Reset"))
+            _sceneInfo.time = 0.0f;
+
+        ImGui::Unindent(16.0f);
+
+        ImGui::Separator();
+
+        // Camera
+        ImGui::Text(ICON_FA_CAMERA " Camera");
+        ImGui::Indent(16.0f);
+            glm::vec3 camPos = _camera->getPosition();
+            ImGui::Text("Position  %.1f  %.1f  %.1f", camPos.x, camPos.y, camPos.z);
+            float radius = _camera->getRadius();
+            if (ImGui::SliderFloat("Distance", &radius, 5.0f, 500.0f))
+                _camera->setRadius(radius);
+        ImGui::Unindent(16.0f);
+
+        ImGui::Separator();
+
+        // Bloom / Blur
+        ImGui::Text(ICON_FA_SUN " Bloom");
+        ImGui::Indent(16.0f);
+            bool changed = false;
+            changed |= ImGui::SliderFloat("Scale",    &blurSettings.blurScale,    0.1f, 10.0f);
+            changed |= ImGui::SliderFloat("Strength", &blurSettings.blurStrength, 0.0f,  5.0f);
+            if (changed)
+                _blurSettingsUBO->copyData(&blurSettings, sizeof(blurSettings));
+        ImGui::Unindent(16.0f);
+
+        ImGui::End();
+    }
 }
 
 
@@ -698,14 +773,14 @@ void SolarSystemRenderer::update(uint32_t currentImage)
     auto elapsedTime = std::chrono::high_resolution_clock::now() - _lastFrameTime;
     float elapsedSeconds = std::chrono::duration<float, std::chrono::seconds::period>(elapsedTime).count();
     if(!_isPaused) {
-        _sceneInfo.time += elapsedSeconds;
+        _sceneInfo.time += elapsedSeconds * _timeScale;
     }
     _lastFrameTime = std::chrono::high_resolution_clock::now();
 
     VkExtent2D swapChainExtent = _swapChain->getSwapChainExtent();
 
     // Propagate transforms top-down through scene graph
-    _sun->propagate(_sceneInfo.time * 2000.f);
+    _sun->propagate(_sceneInfo.time * 500.f);
 
     // Update camera position based on time
     _camera->setTarget(_selectableObjects[_currentTargetObjectID]->getPosition());

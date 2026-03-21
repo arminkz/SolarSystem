@@ -15,8 +15,9 @@ Earth::Earth(std::shared_ptr<VulkanContext> ctx,
              float orbitAtT0,
              float orbitPerSec,
              float spinAtT0,
-             float spinPerSec)
-    : Planet(std::move(ctx), std::move(name), std::move(mesh), std::move(baseColorTexture), planetSize, orbitRadius, orbitAtT0, orbitPerSec, spinAtT0, spinPerSec),
+             float spinPerSec,
+             float orbitInclination)
+    : Planet(std::move(ctx), std::move(name), std::move(mesh), std::move(baseColorTexture), planetSize, orbitRadius, orbitAtT0, orbitPerSec, spinAtT0, spinPerSec, orbitInclination),
       _unlitColorTexture(std::move(unlitColorTexture)),
       _normalMapTexture(std::move(normalMapTexture)),
       _specularTexture(std::move(specularTexture)),

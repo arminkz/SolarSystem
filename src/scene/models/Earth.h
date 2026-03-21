@@ -26,7 +26,8 @@ public:
           float orbitAtT0,
           float orbitPerSec,
           float spinAtT0,
-          float spinPerSec);
+          float spinPerSec,
+          float orbitInclination = 0.0f);
 
     ~Earth();
 

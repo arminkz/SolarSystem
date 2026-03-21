@@ -16,7 +16,8 @@ public:
           std::shared_ptr<DeviceMesh> mesh,
           float orbitSize,
           float orbitAtT0,
-          float orbitPerSec);
+          float orbitPerSec,
+          float orbitInclination = 0.0f);
 
     ~Orbit();
 
@@ -28,4 +29,5 @@ protected:
     float _orbitSize = 1.0f;           // Used for scaling the model
     float _orbitAtT0 = 0.0f;           // Initial orbit angle
     float _orbitPerSec = 0.0f;         // Orbit speed
+    float _orbitInclination = 0.0f;    // Orbital inclination (degrees)
 };

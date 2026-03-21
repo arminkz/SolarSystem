@@ -24,7 +24,8 @@ public:
            float orbitAtT0,
            float orbitPerSec,
            float spinAtT0,
-           float spinPerSec);
+           float spinPerSec,
+           float orbitInclination = 0.0f);
            
     ~Planet();
 
@@ -42,6 +43,7 @@ protected:
     float _orbitPerSec = 0.0f;
     float _spinAtT0 = 0.0f;
     float _spinPerSec = 0.0f;
+    float _orbitInclination = 0.0f;
 
     std::shared_ptr<Texture2D> _baseColorTexture;
     std::unique_ptr<DescriptorSet> _descriptorSet;

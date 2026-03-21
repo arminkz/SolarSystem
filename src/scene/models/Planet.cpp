@@ -11,7 +11,8 @@ Planet::Planet(std::shared_ptr<VulkanContext> ctx,
                float orbitAtT0,
                float orbitPerSec,
                float spinAtT0,
-               float spinPerSec)
+               float spinPerSec,
+               float orbitInclination)
 
     : SelectableModel(ctx, std::move(name), std::move(mesh)),
     _baseColorTexture(std::move(baseColorTexture)),
@@ -20,7 +21,8 @@ Planet::Planet(std::shared_ptr<VulkanContext> ctx,
     _orbitAtT0(orbitAtT0),
     _orbitPerSec(orbitPerSec),
     _spinAtT0(spinAtT0),
-    _spinPerSec(spinPerSec)
+    _spinPerSec(spinPerSec),
+    _orbitInclination(orbitInclination)
 {
     std::vector<Descriptor> descriptors = {
         Descriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1, _baseColorTexture->getDescriptorInfo()), // Base color texture
@@ -38,11 +40,14 @@ Planet::~Planet()
 void Planet::computeLocalMatrix(float t)
 {
     // Orbit offset relative to parent origin
-    glm::vec3 localPos = glm::vec3(
-        _orbitRadius * cos(-glm::radians(_orbitAtT0 + _orbitPerSec * t)),
+    float angle = -glm::radians(_orbitAtT0 + _orbitPerSec * t);
+    glm::mat4 inclinationMat = glm::rotate(glm::mat4(1.0f), glm::radians(_orbitInclination), glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::vec3 localPos = glm::vec3(inclinationMat * glm::vec4(
+        _orbitRadius * cos(angle),
         0.0f,
-        _orbitRadius * sin(-glm::radians(_orbitAtT0 + _orbitPerSec * t))
-    );
+        _orbitRadius * sin(angle),
+        1.0f
+    ));
 
     glm::mat4 rotation90 = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 spin = glm::rotate(glm::mat4(1.0f), glm::radians(_spinAtT0 + _spinPerSec * t), glm::vec3(0.0f, 1.0f, 0.0f));
