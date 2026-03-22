@@ -10,7 +10,7 @@
 #include "scene/SelectableModel.h"
 
 class Renderer;
-class SolarSystemRenderer;
+class MultiPassRenderer;
 
 class Planet : public SelectableModel
 {
@@ -21,11 +21,11 @@ public:
            std::shared_ptr<Texture2D> baseColorTexture,
            float planetSize,
            float orbitRadius,
-           float orbitAtT0,
-           float orbitPerSec,
-           float spinAtT0,
-           float spinPerSec,
-           float orbitInclination = 0.0f);
+           float orbitOffset,
+           float orbitVelocity,
+           float spinVelocity,
+           float orbitInclination = 0.0f,
+           float axialTilt = 0.0f);
            
     ~Planet();
 
@@ -39,11 +39,11 @@ public:
 protected:
     float _size = 1.0f;                        //Used for scaling the model
     float _orbitRadius = 0.0f;
-    float _orbitAtT0 = 0.0f;
-    float _orbitPerSec = 0.0f;
-    float _spinAtT0 = 0.0f;
-    float _spinPerSec = 0.0f;
+    float _orbitOffset = 0.0f;
+    float _orbitVelocity = 0.0f;
+    float _spinVelocity = 0.0f;
     float _orbitInclination = 0.0f;
+    float _axialTilt = 0.0f;
 
     std::shared_ptr<Texture2D> _baseColorTexture;
     std::unique_ptr<DescriptorSet> _descriptorSet;

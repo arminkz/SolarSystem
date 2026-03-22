@@ -23,11 +23,11 @@ public:
           std::shared_ptr<Texture2D> overlayColorTexture,
           float planetSize,
           float orbitRadius,
-          float orbitAtT0,
-          float orbitPerSec,
-          float spinAtT0,
-          float spinPerSec,
-          float orbitInclination = 0.0f);
+          float orbitOffset,
+          float orbitVelocity,
+          float spinVelocity,
+          float orbitInclination = 0.0f,
+          float axialTilt = 0.0f);
 
     ~Earth();
 

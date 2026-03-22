@@ -1,6 +1,6 @@
 #include "SkyBox.h"
 
-#include "scene/SolarSystemRenderer.h"
+#include "core/MultiPassRenderer.h"
 
 
 SkyBox::SkyBox(std::shared_ptr<VulkanContext> ctx, 
@@ -27,7 +27,7 @@ SkyBox::~SkyBox()
 
 void SkyBox::draw(VkCommandBuffer commandBuffer, const Renderer& renderer)
 {
-    const SolarSystemRenderer* ssScene = dynamic_cast<const SolarSystemRenderer*>(&renderer);
+    const MultiPassRenderer* ssScene = dynamic_cast<const MultiPassRenderer*>(&renderer);
 
     auto pipeline = _pipeline.lock();
     if (!pipeline) {

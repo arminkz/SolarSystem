@@ -1,5 +1,5 @@
 #include "core/FramePresenter.h"
-#include "scene/SolarSystemRenderer.h"
+#include "scene/SolarSystem.h"
 
 FramePresenter::FramePresenter(std::shared_ptr<VulkanContext> ctx)
     : _ctx(std::move(ctx))
@@ -7,7 +7,7 @@ FramePresenter::FramePresenter(std::shared_ptr<VulkanContext> ctx)
     spdlog::info("Max Frames in flight: {}", MAX_FRAMES_IN_FLIGHT);
 
     _swapChain = std::make_shared<SwapChain>(_ctx);
-    _renderer = std::make_unique<SolarSystemRenderer>(_ctx, _swapChain);
+    _renderer = std::make_unique<SolarSystem>(_ctx, _swapChain);
     _gui = std::make_unique<GUI>(_ctx, _ctx->window, _swapChain->getSwapChainImageFormat());
 
     createCommandBuffers();
@@ -159,7 +159,8 @@ void FramePresenter::present() {
     _renderer->buildUI();
 
     // Update Scene
-    _renderer->update(_frameCounter);
+    _renderer->setCurrentFrame(_frameCounter);
+    _renderer->update();
 
     // Begin command buffer
     VkCommandBufferBeginInfo beginInfo{};

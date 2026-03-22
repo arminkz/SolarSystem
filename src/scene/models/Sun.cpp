@@ -1,6 +1,6 @@
 #include "Sun.h"
 
-#include "scene/SolarSystemRenderer.h"
+#include "core/MultiPassRenderer.h"
 
 
 Sun::Sun(std::shared_ptr<VulkanContext> ctx, 
@@ -27,7 +27,7 @@ void Sun::computeLocalMatrix(float /*t*/)
 
 void Sun::draw(VkCommandBuffer commandBuffer, const Renderer& renderer)
 {
-    const SolarSystemRenderer* ssScene = dynamic_cast<const SolarSystemRenderer*>(&renderer);
+    const MultiPassRenderer* ssScene = dynamic_cast<const MultiPassRenderer*>(&renderer);
 
     auto pipeline = _pipeline.lock();
     if (!pipeline) {
@@ -57,7 +57,7 @@ void Sun::draw(VkCommandBuffer commandBuffer, const Renderer& renderer)
 
 void Sun::drawSelection(VkCommandBuffer commandBuffer, const Renderer& renderer)
 {
-    const SolarSystemRenderer* ssScene = dynamic_cast<const SolarSystemRenderer*>(&renderer);
+    const MultiPassRenderer* ssScene = dynamic_cast<const MultiPassRenderer*>(&renderer);
 
     auto selectionPipeline = _selectionPipeline.lock();
     if (!selectionPipeline) {

@@ -10,11 +10,11 @@ public:
     Renderer(std::shared_ptr<VulkanContext> ctx, std::shared_ptr<SwapChain> swapChain)
         : _ctx(std::move(ctx)), _swapChain(std::move(swapChain)) {}
     virtual ~Renderer() = default;
-
-    // Update the scene (called every frame before drawing) (0 < currentImage < MAX_FRAMES_IN_FLIGHT)
-    virtual void update(uint32_t currentImage) { _currentFrame = currentImage; }
+    
+    virtual void update() = 0; // called every frame
     virtual void recordToCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) = 0;
-    virtual void onSwapChainRecreated() {}
+    virtual void onSwapChainRecreated() { }
+    void setCurrentFrame(uint32_t frameIndex) { _currentFrame = frameIndex; } // (0 < currentFrame < MAX_FRAMES_IN_FLIGHT)
 
     // Handle mouse click events
     virtual void handleMouseClick(float mouseX, float mouseY) = 0;
@@ -23,7 +23,7 @@ public:
     virtual void handleKeyDown(int key, int scancode, int modifiers) = 0;
 
     // Called each frame to build scene-specific ImGui controls
-    virtual void buildUI() {}
+    virtual void buildUI() = 0;
 
 protected:
     std::shared_ptr<VulkanContext> _ctx;

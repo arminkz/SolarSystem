@@ -1,6 +1,6 @@
 #include "Earth.h"
 
-#include "scene/SolarSystemRenderer.h"
+#include "core/MultiPassRenderer.h"
 
 Earth::Earth(std::shared_ptr<VulkanContext> ctx, 
              std::string name, 
@@ -12,12 +12,12 @@ Earth::Earth(std::shared_ptr<VulkanContext> ctx,
              std::shared_ptr<Texture2D> overlayColorTexture,
              float planetSize,
              float orbitRadius,
-             float orbitAtT0,
-             float orbitPerSec,
-             float spinAtT0,
-             float spinPerSec,
-             float orbitInclination)
-    : Planet(std::move(ctx), std::move(name), std::move(mesh), std::move(baseColorTexture), planetSize, orbitRadius, orbitAtT0, orbitPerSec, spinAtT0, spinPerSec, orbitInclination),
+             float orbitOffset,
+             float orbitVelocity,
+             float spinVelocity,
+             float orbitInclination,
+             float axialTilt)
+    : Planet(std::move(ctx), std::move(name), std::move(mesh), std::move(baseColorTexture), planetSize, orbitRadius, orbitOffset, orbitVelocity, spinVelocity, orbitInclination, axialTilt),
       _unlitColorTexture(std::move(unlitColorTexture)),
       _normalMapTexture(std::move(normalMapTexture)),
       _specularTexture(std::move(specularTexture)),
@@ -42,7 +42,7 @@ Earth::~Earth()
 
 void Earth::draw(VkCommandBuffer commandBuffer, const Renderer& renderer)
 {
-    const SolarSystemRenderer* ssScene = dynamic_cast<const SolarSystemRenderer*>(&renderer);
+    const MultiPassRenderer* ssScene = dynamic_cast<const MultiPassRenderer*>(&renderer);
 
     auto pipeline = _pipeline.lock();
     if (!pipeline) {
@@ -73,7 +73,7 @@ void Earth::draw(VkCommandBuffer commandBuffer, const Renderer& renderer)
 
 void Earth::drawSelection(VkCommandBuffer commandBuffer, const Renderer& renderer)
 {
-    const SolarSystemRenderer* ssScene = dynamic_cast<const SolarSystemRenderer*>(&renderer);
+    const MultiPassRenderer* ssScene = dynamic_cast<const MultiPassRenderer*>(&renderer);
 
     auto selectionPipeline = _selectionPipeline.lock();
     if (!selectionPipeline) {

@@ -1,18 +1,18 @@
 #include "Orbit.h"
 
-#include "scene/SolarSystemRenderer.h"
+#include "core/MultiPassRenderer.h"
 
 Orbit::Orbit(std::shared_ptr<VulkanContext> ctx,
              std::string name,
              std::shared_ptr<DeviceMesh> mesh,
              float orbitSize,
-             float orbitAtT0,
-             float orbitPerSec,
+             float orbitOffset,
+             float orbitVelocity,
              float orbitInclination)
     : Model(ctx, std::move(name), std::move(mesh)),
       _orbitSize(orbitSize),
-      _orbitAtT0(orbitAtT0),
-      _orbitPerSec(orbitPerSec),
+      _orbitOffset(orbitOffset),
+      _orbitVelocity(orbitVelocity),
       _orbitInclination(orbitInclination)
 {
 }
@@ -26,7 +26,7 @@ Orbit::~Orbit()
 
 void Orbit::computeLocalMatrix(float t)
 {
-    glm::mat4 spin = glm::rotate(glm::mat4(1.0f), glm::radians(_orbitAtT0 + _orbitPerSec * t), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 spin = glm::rotate(glm::mat4(1.0f), glm::radians(_orbitOffset + _orbitVelocity * t), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(_orbitSize * 2.0f));
     glm::mat4 tilt = glm::rotate(glm::mat4(1.0f), glm::radians(_orbitInclination), glm::vec3(1.0f, 0.0f, 0.0f));
     _localMatrix = tilt * scale * spin;
@@ -35,7 +35,7 @@ void Orbit::computeLocalMatrix(float t)
 
 void Orbit::draw(VkCommandBuffer commandBuffer, const Renderer& renderer)
 {
-    const SolarSystemRenderer* ssScene = dynamic_cast<const SolarSystemRenderer*>(&renderer);
+    const MultiPassRenderer* ssScene = dynamic_cast<const MultiPassRenderer*>(&renderer);
 
     auto pipeline = _pipeline.lock();
     if (!pipeline) {

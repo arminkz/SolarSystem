@@ -21,7 +21,7 @@ struct SwapChainSupportDetails {
 
 namespace VulkanHelper {
 
-    VkCommandBuffer beginSingleTimeCommands(const std::shared_ptr<VulkanContext>& ctx);
+    [[nodiscard]] VkCommandBuffer beginSingleTimeCommands(const std::shared_ptr<VulkanContext>& ctx);
     void endSingleTimeCommands(const std::shared_ptr<VulkanContext>& ctx, VkCommandBuffer commandBuffer);
 
     uint32_t findMemoryType(const std::shared_ptr<VulkanContext>& ctx, uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -32,8 +32,7 @@ namespace VulkanHelper {
     void copyBufferToCubemap(const std::shared_ptr<VulkanContext>& ctx, VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
     void copyImageToBuffer(const std::shared_ptr<VulkanContext>& ctx, VkImage image, VkBuffer buffer, uint32_t width, uint32_t height);
 
-    uint64_t getBufferDeviceAddress(const std::shared_ptr<VulkanContext>& ctx,
-        VkBuffer buffer);
+    uint64_t getBufferDeviceAddress(const std::shared_ptr<VulkanContext>& ctx, VkBuffer buffer);
 
     void createImage(const std::shared_ptr<VulkanContext>& ctx,
         uint32_t width, uint32_t height,
@@ -47,8 +46,7 @@ namespace VulkanHelper {
         VkImage& image, VkDeviceMemory& imageMemory,
         VkImageCreateFlags flags = 0);
 
-
-    VkImageView createImageView(const std::shared_ptr<VulkanContext>& ctx,
+    [[nodiscard]] VkImageView createImageView(const std::shared_ptr<VulkanContext>& ctx,
         VkImage image,
         VkFormat format,
         uint32_t mipLevels,
@@ -79,13 +77,14 @@ namespace VulkanHelper {
 
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
-
     VkFormat findSupportedFormat(const std::shared_ptr<VulkanContext>& ctx, const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
     VkFormat findDepthFormat(const std::shared_ptr<VulkanContext>& ctx);
     VkSampleCountFlagBits getMaxMsaaSampleCount(const std::shared_ptr<VulkanContext>& ctx);
+    
     bool hasStencilComponent(VkFormat format);
 
     std::string formatToString(VkFormat format);
+    
     std::string imageLayoutToString(VkImageLayout layout);
 
     uint32_t alignedSize(uint32_t value, uint32_t alignment);
