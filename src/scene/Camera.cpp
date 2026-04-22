@@ -65,20 +65,56 @@ void Camera::setTargetAnimated(const glm::vec3& target) {
     _animationEndTarget = target;
     _animationDuration = 1.0f;
     _animationElapsed = 0.0f;
+    // No radius animation: hold current radius across all phases.
+    _animationStartRadius = _radius;
+    _animationPulloutRadius = _radius;
+    _animationEndRadius = _radius;
+}
+
+void Camera::switchTargetAnimated(const glm::vec3& target,
+                                  float pulloutRadius,
+                                  float arrivalRadius,
+                                  float duration) {
+    _isAnimating = true;
+    _animationStartTarget = _target;
+    _animationEndTarget = target;
+    _animationDuration = duration;
+    _animationElapsed = 0.0f;
+    _animationStartRadius = _radius;
+    _animationPulloutRadius = pulloutRadius;
+    _animationEndRadius = arrivalRadius;
 }
 
 void Camera::advanceAnimation(float deltaTime) {
-    if (_isAnimating) {
-        _animationElapsed += deltaTime;
-        float t = glm::clamp(_animationElapsed / _animationDuration, 0.0f, 1.0f);
-        float easedT = easeInOutCubic(t); // cubic easing function
-        _target = glm::mix(_animationStartTarget, _animationEndTarget, easedT);
+    if (!_isAnimating) return;
 
-        _viewMatrix = glm::lookAt(_target + _radius * -1.f * _forward, _target, _up);
+    _animationElapsed += deltaTime;
+    float t = glm::clamp(_animationElapsed / _animationDuration, 0.0f, 1.0f);
 
-        if (t >= 1.0f) {
-            _isAnimating = false;
-        }
+    // Three phases: pull out (0–0.33) → travel (0.33–0.67) → zoom in (0.67–1.0).
+    constexpr float p1 = 0.33f;
+    constexpr float p2 = 0.67f;
+
+    if (t < p1) {
+        float phaseT = easeInOutCubic(t / p1);
+        _radius = glm::mix(_animationStartRadius, _animationPulloutRadius, phaseT);
+        _target = _animationStartTarget;
+    }
+    else if (t < p2) {
+        float phaseT = easeInOutCubic((t - p1) / (p2 - p1));
+        _radius = _animationPulloutRadius;
+        _target = glm::mix(_animationStartTarget, _animationEndTarget, phaseT);
+    }
+    else {
+        float phaseT = easeInOutCubic((t - p2) / (1.0f - p2));
+        _radius = glm::mix(_animationPulloutRadius, _animationEndRadius, phaseT);
+        _target = _animationEndTarget;
+    }
+
+    _viewMatrix = glm::lookAt(_target + _radius * -1.f * _forward, _target, _up);
+
+    if (t >= 1.0f) {
+        _isAnimating = false;
     }
 }
 

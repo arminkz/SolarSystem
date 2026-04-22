@@ -36,6 +36,10 @@ public:
     glm::vec3 getTarget() const { return _target; }
     void setTarget(const glm::vec3& target);
     void setTargetAnimated(const glm::vec3& target);
+    void switchTargetAnimated(const glm::vec3& target,
+                              float pulloutRadius,
+                              float arrivalRadius,
+                              float duration = 2.5f);
 
     glm::vec3 getForward() const { return _forward; }
     void setForward(const glm::vec3& forward) { _forward = glm::normalize(forward); };
@@ -66,6 +70,9 @@ private:
     glm::vec3 _animationEndTarget;
     float _animationDuration = 1.0f; // in seconds
     float _animationElapsed = 0.0f;
+    float _animationStartRadius = 0.f;
+    float _animationPulloutRadius = 0.f;
+    float _animationEndRadius = 0.f;
 
     float easeInOutCubic(float t);
 };

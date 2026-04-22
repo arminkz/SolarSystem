@@ -68,19 +68,23 @@ void SolarSystem::buildUI()
     const ImVec4 colHot    (1, 1, 1, 1.00f);
 
     static const std::pair<const char*, float> speeds[] = {
-        {"-100x", -100.0f},
-        {"-20x",   -20.0f},
-        {"-10x",   -10.0f},
-        {"-5x",     -5.0f},
-        {"-1x",     -1.0f},
-        {"1x",       1.0f},
-        {"5x",       5.0f},
-        {"10x",     10.0f},
-        {"20x",     20.0f},
-        {"100x",   100.0f},
+        {"-100x",  -100.0f},
+        {"-20x",    -20.0f},
+        {"-10x",    -10.0f},
+        {"-5x",      -5.0f},
+        {"-1x",      -1.0f},
+        {"-0.5x",    -0.5f},
+        {"-0.25x",  -0.25f},
+        {"0.25x",    0.25f},
+        {"0.5x",      0.5f},
+        {"1x",        1.0f},
+        {"5x",        5.0f},
+        {"10x",      10.0f},
+        {"20x",      20.0f},
+        {"100x",    100.0f},
     };
-    static constexpr int speedCount = 10;
-    static int speedIndex = 5; // default: 1x
+    static constexpr int speedCount = 14;
+    static int speedIndex = 9; // default: 1x
 
     ImGui::PushStyleColor(ImGuiCol_Border,        ImVec4(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0, 0, 0, 0));
@@ -183,6 +187,34 @@ void SolarSystem::buildUI()
 
 void SolarSystem::handleKeyDown(int key, int scancode, int modifiers)
 {
+    // Number-key planet selection: 0=Sun, 1-9=Mercury…Pluto (Moon skipped).
+    // Each entry is (objectID, arrivalRadius). IDs follow creation order in createModels().
+    static const std::array<std::pair<int, float>, 10> keyToTarget = {{
+        {1,  sizeSun     * 8.0f},   // 0 = Sun
+        {2,  sizeMercury * 8.0f},   // 1 = Mercury
+        {3,  sizeVenus   * 8.0f},   // 2 = Venus
+        {4,  sizeEarth   * 8.0f},   // 3 = Earth
+        {6,  sizeMars    * 8.0f},   // 4 = Mars  (Moon = ID 5, skipped)
+        {7,  sizeJupiter * 8.0f},   // 5 = Jupiter
+        {8,  sizeSaturn  * 8.0f},   // 6 = Saturn
+        {9,  sizeUranus  * 8.0f},   // 7 = Uranus
+        {10, sizeNeptune * 8.0f},   // 8 = Neptune
+        {11, sizePluto   * 8.0f},   // 9 = Pluto
+    }};
+
+    if (key >= SDLK_0 && key <= SDLK_9) {
+        int slot = (key == SDLK_0) ? 0 : (key - SDLK_0);
+        const auto& [id, arrivalRadius] = keyToTarget[slot];
+        if (id != static_cast<int>(_currentTargetObjectID)) {
+            glm::vec3 newPos = _selectableModels[id]->getPosition();
+            float pullout = std::max(_camera->getRadius() * 1.5f, 250.0f);
+            _camera->switchTargetAnimated(newPos, pullout, arrivalRadius);
+            _currentTargetObjectID = id;
+            spdlog::info("Camera target switched to {}", _selectableModels[id]->getName());
+        }
+        return;
+    }
+
     switch (key) {
         case SDLK_SPACE:
             _isPaused = !_isPaused;
@@ -191,7 +223,7 @@ void SolarSystem::handleKeyDown(int key, int scancode, int modifiers)
         case SDLK_C:
             _showUI = !_showUI;
             break;
-        case SDLK_0:
+        case SDLK_R:
             _sceneInfo.time = 0.f;
             spdlog::info("Simulation time reset to zero");
             break;
