@@ -171,6 +171,16 @@ void SolarSystem::buildUI()
 
         ImGui::Separator();
 
+        ImGui::Text(ICON_FA_CIRCLE_NOTCH " Orbits");
+        ImGui::Indent(16.0f);
+        if (ImGui::Checkbox("Show orbits", &_showOrbits)) {
+            for (auto& orbit : _orbits)
+                orbit->setVisible(_showOrbits);
+        }
+        ImGui::Unindent(16.0f);
+
+        ImGui::Separator();
+
         ImGui::Text(ICON_FA_SUN " Bloom");
         ImGui::Indent(16.0f);
         bool changed = false;

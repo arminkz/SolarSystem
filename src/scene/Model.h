@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "pch.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/Pipeline.h"
 #include "core/Renderer.h"
@@ -17,6 +17,9 @@ public:
 
     virtual void draw(VkCommandBuffer commandBuffer, const Renderer& renderer) = 0;
     void setPipeline(std::shared_ptr<Pipeline> pipeline) { _pipeline = std::move(pipeline); }
+
+    bool isVisible() const { return _visible; }
+    void setVisible(bool v) { _visible = v; }
 
     // Scene graph
     void addChild(std::shared_ptr<Model> child);
@@ -36,4 +39,6 @@ protected:
     glm::mat4 _localMatrix = glm::mat4(1.f);
     std::shared_ptr<Model> _parent;
     std::vector<std::shared_ptr<Model>> _children;
+
+    bool _visible = true;
 };

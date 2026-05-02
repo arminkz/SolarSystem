@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+#include "pch.h"
 #include "VulkanContext.h"
 #include "geometry/Vertex.h"
 

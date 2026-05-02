@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdafx.h"
+#include "pch.h"
 #include "core/MultiPassRenderer.h"
 #include "models/Planet.h"
 #include "models/Sun.h"
@@ -52,6 +52,8 @@ private:
     // Bloom settings (local copy for UI sliders)
     float _bloomScale    = 2.0f;
     float _bloomStrength = 1.5f;
+
+    bool _showOrbits = true;
 
     // Save / load
     void saveSceneState(const std::string& filename);

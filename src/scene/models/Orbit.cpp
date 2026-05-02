@@ -35,6 +35,8 @@ void Orbit::computeLocalMatrix(float t)
 
 void Orbit::draw(VkCommandBuffer commandBuffer, const Renderer& renderer)
 {
+    if (!_visible) return;
+
     const MultiPassRenderer* ssScene = dynamic_cast<const MultiPassRenderer*>(&renderer);
 
     auto pipeline = _pipeline.lock();

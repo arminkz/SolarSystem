@@ -77,4 +77,16 @@ add_compile_definitions("ASSET_DIR=${CMAKE_SOURCE_DIR}/assets/")
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDES})
+
+# GLM compile-time options
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    GLM_FORCE_RADIANS
+    GLM_FORCE_DEPTH_ZERO_TO_ONE
+    GLM_ENABLE_EXPERIMENTAL
+)
+
+# Precompiled header (skip external ImGui sources — they manage their own includes)
+set_source_files_properties(${IMGUI_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.h)
+
 message(STATUS "I hate myself so I use cmake!")

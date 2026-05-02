@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdafx.h"
+#include "pch.h"
 
 #include "vulkan/resources/Texture2D.h"
 #include "vulkan/Pipeline.h"
