@@ -207,9 +207,9 @@ void SolarSystem::handleKeyDown(int key, int scancode, int modifiers)
         {6,  sizeMars    * 8.0f},   // 4 = Mars  (Moon = ID 5, skipped)
         {7,  sizeJupiter * 8.0f},   // 5 = Jupiter
         {8,  sizeSaturn  * 8.0f},   // 6 = Saturn
-        {9,  sizeUranus  * 8.0f},   // 7 = Uranus
-        {10, sizeNeptune * 8.0f},   // 8 = Neptune
-        {11, sizePluto   * 8.0f},   // 9 = Pluto
+        {10, sizeUranus  * 8.0f},   // 7 = Uranus (SaturnRing = ID 9, skipped)
+        {11, sizeNeptune * 8.0f},   // 8 = Neptune
+        {12, sizePluto   * 8.0f},   // 9 = Pluto
     }};
 
     if (key >= SDLK_0 && key <= SDLK_9) {
