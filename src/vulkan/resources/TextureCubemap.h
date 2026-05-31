@@ -11,6 +11,12 @@ public:
     TextureCubemap(std::shared_ptr<VulkanContext> ctx, const std::string& path, VkFormat format);
     ~TextureCubemap();
 
+    // Non-copyable and non-movable (owns raw Vulkan handles)
+    TextureCubemap(const TextureCubemap&) = delete;
+    TextureCubemap& operator=(const TextureCubemap&) = delete;
+    TextureCubemap(TextureCubemap&&) = delete;
+    TextureCubemap& operator=(TextureCubemap&&) = delete;
+
     uint32_t getWidth() const { return _width; }
     uint32_t getHeight() const { return _height; }
     VkImage getImage() const { return _cubemapImage; }

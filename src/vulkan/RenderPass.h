@@ -35,6 +35,12 @@ public:
     RenderPass(std::shared_ptr<VulkanContext> ctx, RenderPassParams params);
     ~RenderPass();
 
+    // Non-copyable and non-movable (owns raw Vulkan handles)
+    RenderPass(const RenderPass&) = delete;
+    RenderPass& operator=(const RenderPass&) = delete;
+    RenderPass(RenderPass&&) = delete;
+    RenderPass& operator=(RenderPass&&) = delete;
+
     VkRenderPass getRenderPass() const { return _renderPass; }
 
 private:

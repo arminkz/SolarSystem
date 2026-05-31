@@ -9,6 +9,12 @@ public:
     Buffer(std::shared_ptr<VulkanContext> ctx, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, bool needsDeviceAddress = false);
     ~Buffer();
 
+    // Non-copyable and non-movable (owns raw Vulkan handles)
+    Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+    Buffer(Buffer&&) = delete;
+    Buffer& operator=(Buffer&&) = delete;
+
     void destroy();
 
     VkBuffer getBuffer() const { return _buffer; }

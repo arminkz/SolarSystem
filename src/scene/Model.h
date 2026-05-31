@@ -10,6 +10,12 @@ class Renderer;
 class Model : public std::enable_shared_from_this<Model>
 {
 public:
+    // Non-copyable and non-movable (owns Vulkan resources; polymorphic base — prevents slicing)
+    Model(const Model&) = delete;
+    Model& operator=(const Model&) = delete;
+    Model(Model&&) = delete;
+    Model& operator=(Model&&) = delete;
+
     const std::string& getName() const { return _name; }
     glm::mat4 getModelMatrix() const { return _modelMatrix; }
     glm::vec3 getPosition() const { return glm::vec3(_modelMatrix[3]); }

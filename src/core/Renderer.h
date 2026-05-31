@@ -10,7 +10,13 @@ public:
     Renderer(std::shared_ptr<VulkanContext> ctx, std::shared_ptr<SwapChain> swapChain)
         : _ctx(std::move(ctx)), _swapChain(std::move(swapChain)) {}
     virtual ~Renderer() = default;
-    
+
+    // Non-copyable and non-movable (owns Vulkan resources; polymorphic base — prevents slicing)
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
+    Renderer(Renderer&&) = delete;
+    Renderer& operator=(Renderer&&) = delete;
+
     virtual void update() = 0; // called every frame
     virtual void recordToCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) = 0;
     virtual void onSwapChainRecreated() { }

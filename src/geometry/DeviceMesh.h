@@ -11,6 +11,12 @@ public:
     DeviceMesh(std::shared_ptr<VulkanContext> ctx, const HostMesh& mesh);
     ~DeviceMesh();
 
+    // Non-copyable and non-movable (owns raw Vulkan handles)
+    DeviceMesh(const DeviceMesh&) = delete;
+    DeviceMesh& operator=(const DeviceMesh&) = delete;
+    DeviceMesh(DeviceMesh&&) = delete;
+    DeviceMesh& operator=(DeviceMesh&&) = delete;
+
     uint32_t getIndicesCount() const { return _indexCount; }
     VkBuffer getVertexBuffer() const { return _vertexBuffer; }
     VkBuffer getIndexBuffer() const { return _indexBuffer; }

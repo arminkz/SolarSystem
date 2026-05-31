@@ -9,6 +9,12 @@ public:
     SwapChain(std::shared_ptr<VulkanContext> ctx);
     ~SwapChain();
 
+    // Non-copyable and non-movable (owns raw Vulkan handles)
+    SwapChain(const SwapChain&) = delete;
+    SwapChain& operator=(const SwapChain&) = delete;
+    SwapChain(SwapChain&&) = delete;
+    SwapChain& operator=(SwapChain&&) = delete;
+
     void createSwapChain();
     void cleanupSwapChain();
 

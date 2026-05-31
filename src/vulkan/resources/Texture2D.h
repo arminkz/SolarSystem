@@ -12,6 +12,12 @@ public:
     Texture2D(std::shared_ptr<VulkanContext> ctx, const void* pixelData, uint32_t width, uint32_t height, VkFormat format, uint32_t mipLevels = 0);
     ~Texture2D();
 
+    // Non-copyable and non-movable (owns raw Vulkan handles)
+    Texture2D(const Texture2D&) = delete;
+    Texture2D& operator=(const Texture2D&) = delete;
+    Texture2D(Texture2D&&) = delete;
+    Texture2D& operator=(Texture2D&&) = delete;
+
     void cleanup();
 
     uint32_t getMipLevels() const { return _mipLevels; }
