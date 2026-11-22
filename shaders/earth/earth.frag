@@ -74,7 +74,9 @@ void main() {
     vec3 reflectDirTBN = reflect(-lightDirTBN, normalTBN);
 
     float specPower = clamp(max(dot(viewDirTBN, reflectDirTBN),0.), 0.0, 1.0);
-    color += reflectRatio * pow(specPower, 2.0) * si.lightColor;
+    // Specular only where the surface is sunlit. Unmasked, the reflection vector lines up with
+    // the view direction along the limb of the night side and shows up as a bright rim.
+    color += mixAmount * reflectRatio * pow(specPower, 2.0) * si.lightColor;
 
     // Cloud shadow effect
     //vec3 originalNormal = vec3(0.0, 0.0, 1.0);
