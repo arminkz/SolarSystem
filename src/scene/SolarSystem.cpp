@@ -255,12 +255,10 @@ void SolarSystem::createModels()
 {
     HostMesh sphere = MeshFactory::createSphereMesh(1.f, 64, 64);
     HostMesh ring   = MeshFactory::createAnnulusMesh(1.3f, 2.2f, 64);
-    HostMesh quad   = MeshFactory::createQuadMesh(1.f, 1.f, true);
     HostMesh cube   = MeshFactory::createCubeMesh(1.f, 1.f, 1.f);
 
     std::shared_ptr<DeviceMesh> sphereDMesh = std::make_shared<DeviceMesh>(_ctx, sphere);
     std::shared_ptr<DeviceMesh> ringDMesh   = std::make_shared<DeviceMesh>(_ctx, ring);
-    std::shared_ptr<DeviceMesh> quadDMesh   = std::make_shared<DeviceMesh>(_ctx, quad);
     std::shared_ptr<DeviceMesh> cubeDMesh   = std::make_shared<DeviceMesh>(_ctx, cube);
 
     // SkyBox
@@ -380,16 +378,16 @@ void SolarSystem::createModels()
     _planets.push_back(pluto);
 
     // Orbits
-    auto mercuryOrbit = std::make_shared<Orbit>(_ctx, "MercuryOrbit", quadDMesh, orbitRadMercury, orbitOffsetMercury, orbitVelocityMercury, orbitInclinationMercury);
-    auto venusOrbit   = std::make_shared<Orbit>(_ctx, "VenusOrbit",   quadDMesh, orbitRadVenus,   orbitOffsetVenus,   orbitVelocityVenus,   orbitInclinationVenus);
-    auto earthOrbit   = std::make_shared<Orbit>(_ctx, "EarthOrbit",   quadDMesh, orbitRadEarth,   orbitOffsetEarth,   orbitVelocityEarth,   orbitInclinationEarth);
-    auto moonOrbit    = std::make_shared<Orbit>(_ctx, "MoonOrbit",    quadDMesh, orbitRadMoon,    orbitOffsetMoon,    orbitVelocityMoon,    orbitInclinationMoon);
-    auto marsOrbit    = std::make_shared<Orbit>(_ctx, "MarsOrbit",    quadDMesh, orbitRadMars,    orbitOffsetMars,    orbitVelocityMars,    orbitInclinationMars);
-    auto jupiterOrbit = std::make_shared<Orbit>(_ctx, "JupiterOrbit", quadDMesh, orbitRadJupiter, orbitOffsetJupiter, orbitVelocityJupiter, orbitInclinationJupiter);
-    auto saturnOrbit  = std::make_shared<Orbit>(_ctx, "SaturnOrbit",  quadDMesh, orbitRadSaturn,  orbitOffsetSaturn,  orbitVelocitySaturn,  orbitInclinationSaturn);
-    auto uranusOrbit  = std::make_shared<Orbit>(_ctx, "UranusOrbit",  quadDMesh, orbitRadUranus,  orbitOffsetUranus,  orbitVelocityUranus,  orbitInclinationUranus);
-    auto neptuneOrbit = std::make_shared<Orbit>(_ctx, "NeptuneOrbit", quadDMesh, orbitRadNeptune, orbitOffsetNeptune, orbitVelocityNeptune, orbitInclinationNeptune);
-    auto plutoOrbit   = std::make_shared<Orbit>(_ctx, "PlutoOrbit",   quadDMesh, orbitRadPluto,   orbitOffsetPluto,   orbitVelocityPluto,   orbitInclinationPluto);
+    auto mercuryOrbit = std::make_shared<Orbit>(_ctx, "MercuryOrbit", orbitRadMercury, orbitOffsetMercury, orbitVelocityMercury, orbitInclinationMercury);
+    auto venusOrbit   = std::make_shared<Orbit>(_ctx, "VenusOrbit",   orbitRadVenus,   orbitOffsetVenus,   orbitVelocityVenus,   orbitInclinationVenus);
+    auto earthOrbit   = std::make_shared<Orbit>(_ctx, "EarthOrbit",   orbitRadEarth,   orbitOffsetEarth,   orbitVelocityEarth,   orbitInclinationEarth);
+    auto moonOrbit    = std::make_shared<Orbit>(_ctx, "MoonOrbit",    orbitRadMoon,    orbitOffsetMoon,    orbitVelocityMoon,    orbitInclinationMoon);
+    auto marsOrbit    = std::make_shared<Orbit>(_ctx, "MarsOrbit",    orbitRadMars,    orbitOffsetMars,    orbitVelocityMars,    orbitInclinationMars);
+    auto jupiterOrbit = std::make_shared<Orbit>(_ctx, "JupiterOrbit", orbitRadJupiter, orbitOffsetJupiter, orbitVelocityJupiter, orbitInclinationJupiter);
+    auto saturnOrbit  = std::make_shared<Orbit>(_ctx, "SaturnOrbit",  orbitRadSaturn,  orbitOffsetSaturn,  orbitVelocitySaturn,  orbitInclinationSaturn);
+    auto uranusOrbit  = std::make_shared<Orbit>(_ctx, "UranusOrbit",  orbitRadUranus,  orbitOffsetUranus,  orbitVelocityUranus,  orbitInclinationUranus);
+    auto neptuneOrbit = std::make_shared<Orbit>(_ctx, "NeptuneOrbit", orbitRadNeptune, orbitOffsetNeptune, orbitVelocityNeptune, orbitInclinationNeptune);
+    auto plutoOrbit   = std::make_shared<Orbit>(_ctx, "PlutoOrbit",   orbitRadPluto,   orbitOffsetPluto,   orbitVelocityPluto,   orbitInclinationPluto);
     _orbits = { mercuryOrbit, venusOrbit, earthOrbit, moonOrbit, marsOrbit,
                 jupiterOrbit, saturnOrbit, uranusOrbit, neptuneOrbit, plutoOrbit };
 
@@ -459,15 +457,21 @@ void SolarSystem::createScenePipelines()
     pp.cullMode    = VK_CULL_MODE_BACK_BIT;
 
     // Orbit pipeline
-    pp.name                 = "OrbitPipeline";
-    pp.descriptorSetLayouts = {sceneDSL};
-    pp.pushConstantRanges   = {{VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4)}};
-    pp.depthTest            = true;
-    pp.depthWrite           = false;
+    pp.name                        = "OrbitPipeline";
+    pp.descriptorSetLayouts        = {sceneDSL};
+    pp.pushConstantRanges          = {{VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Orbit::PushConstants)}};
+    pp.vertexBindingDescription    = std::nullopt; // vertices are generated in the vertex shader
+    pp.vertexAttributeDescriptions = {};
+    pp.cullMode                    = VK_CULL_MODE_NONE; // quad winding depends on the line direction
+    pp.depthTest                   = true;
+    pp.depthWrite                  = false;
     _orbitPipeline = std::make_unique<Pipeline>(_ctx,
         AssetPath::getInstance()->get("spv/orbit/orbit_vert.spv"),
         AssetPath::getInstance()->get("spv/orbit/orbit_frag.spv"), pp);
-    pp.depthWrite = true;
+    pp.vertexBindingDescription    = Vertex::getBindingDescription();
+    pp.vertexAttributeDescriptions = Vertex::getAttributeDescriptions();
+    pp.cullMode                    = VK_CULL_MODE_BACK_BIT;
+    pp.depthWrite                  = true;
 
     // GlowSphere pipeline
     pp.name                 = "GlowSpherePipeline";

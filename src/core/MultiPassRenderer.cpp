@@ -291,7 +291,8 @@ void MultiPassRenderer::update()
     _sceneInfo.projection = glm::perspective(glm::radians(45.f),(float)swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 4000.f);
     _sceneInfo.projection[1][1] *= -1;
     _sceneInfo.cameraPosition = _camera->getPosition();
-    
+    _sceneInfo.viewportSize = glm::vec2(swapChainExtent.width, swapChainExtent.height); // the scene pass renders at swapchain size
+
     // Application specific updates (present in child class)
     advance();
 

@@ -42,6 +42,7 @@ protected:
         alignas(4)  float time = 0.0f;
         alignas(16) glm::vec3 cameraPosition;
         alignas(16) glm::vec3 lightColor;
+        alignas(8)  glm::vec2 viewportSize = glm::vec2(1.0f); // in pixels (std140 offset 176)
     } _sceneInfo;
 
     std::array<std::unique_ptr<Buffer>, MAX_FRAMES_IN_FLIGHT> _sceneInfoUBOs;
