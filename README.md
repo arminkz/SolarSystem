@@ -71,10 +71,10 @@ cmake --build .
 ### Running
 ```bash
 # From build directory
-./VulkanEngine
+./SolarSystem
 
 # With verbose logging
-./VulkanEngine -vvv
+./SolarSystem -vvv
 ```
 
 ## Vulkan Pipeline

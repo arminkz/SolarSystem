@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(VulkanEngine)
+project(SolarSystem)
 
 # Set the C++ standard to C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -27,6 +27,16 @@ add_subdirectory(external/spdlog)
 add_subdirectory(external/glm)
 add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
 
+# Single-header libraries: each gets a small static library that compiles the implementation
+# once. The *_IMPLEMENTATION define is PRIVATE so it never reaches our own sources or pch.h.
+add_library(stb_image STATIC external/stb/stb_image_impl.cpp)
+target_include_directories(stb_image SYSTEM PUBLIC external/stb)
+target_compile_definitions(stb_image PRIVATE STB_IMAGE_IMPLEMENTATION)
+
+add_library(tinyobjloader STATIC external/tinyobjloader/tiny_obj_loader_impl.cpp)
+target_include_directories(tinyobjloader SYSTEM PUBLIC external/tinyobjloader)
+target_compile_definitions(tinyobjloader PRIVATE TINYOBJLOADER_IMPLEMENTATION)
+
 # ImGui sources
 set(IMGUI_SOURCES
     external/imgui/imgui.cpp
@@ -44,6 +54,8 @@ set(LIBRARIES
     spdlog::spdlog
     glm::glm
     SDL3::SDL3
+    stb_image
+    tinyobjloader
 )
 
 # Handle .cpp files
@@ -66,8 +78,6 @@ endif()
 
 # Handle .h files
 set(INCLUDES ${INCLUDES} src)
-set(INCLUDES ${INCLUDES} external/stb)
-set(INCLUDES ${INCLUDES} external/tinyobjloader)
 set(INCLUDES ${INCLUDES} external/imgui)
 set(INCLUDES ${INCLUDES} external/imgui/backends)
 

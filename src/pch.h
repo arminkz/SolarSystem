@@ -21,12 +21,14 @@
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_vulkan.h"
 
+// [stb] declarations only; the implementation is compiled by the stb_image target (see CMakeLists.txt)
+#include "stb_image.h"
+
 // [Standard libraries: basic]
 #include <algorithm>
 #include <cmath>
 #include <chrono>
 #include <cstdint>
-#include <execution>
 #include <fstream>
 #include <functional>
 #include <iostream>

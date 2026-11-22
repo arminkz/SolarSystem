@@ -1,7 +1,5 @@
 #include "TextureCubemap.h"
 
-#include "stb_image.h"
-
 TextureCubemap::TextureCubemap(std::shared_ptr<VulkanContext> ctx, const std::string& path, VkFormat format)
     : _ctx(std::move(ctx))
 {
