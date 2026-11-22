@@ -1,6 +1,7 @@
 #include "SinglePassRenderer.h"
 
 #include "vulkan/VulkanHelper.h"
+#include "vulkan/VulkanDebug.h"
 #include "core/AssetPath.h"
 
 
@@ -170,8 +171,11 @@ void SinglePassRenderer::recordToCommandBuffer(VkCommandBuffer commandBuffer, ui
     sc.extent = _swapChain->getSwapChainExtent();
     vkCmdSetScissor(commandBuffer, 0, 1, &sc);
 
-    for (auto& model : _sceneModels)
+    for (auto& model : _sceneModels) {
+        vkdebug::beginLabel(commandBuffer, model->getName().c_str());
         model->draw(commandBuffer, *this);
+        vkdebug::endLabel(commandBuffer);
+    }
 
     vkCmdEndRenderPass(commandBuffer);
 }

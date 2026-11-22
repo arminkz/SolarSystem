@@ -1,6 +1,7 @@
 #include "MultiPassRenderer.h"
 
 #include "vulkan/VulkanHelper.h"
+#include "vulkan/VulkanDebug.h"
 #include "vulkan/resources/TextureSampler.h"
 #include "core/AssetPath.h"
 
@@ -330,18 +331,23 @@ void MultiPassRenderer::recordToCommandBuffer(VkCommandBuffer commandBuffer, uin
     /*
         Pass 1 — Glow extraction
     */
+    vkdebug::beginLabel(commandBuffer, "1 Glow extraction", {1.0f, 0.6f, 0.0f, 1.0f});
     beginOffscreenPass(0);
     for (auto& entry : _glowPassModels) {
+        vkdebug::beginLabel(commandBuffer, entry.model->getName().c_str());
         if (entry.useGlowPipeline)
             drawWithGlowPipeline(commandBuffer, *entry.model, entry.glowColor);
         else
             entry.model->draw(commandBuffer, *this);
+        vkdebug::endLabel(commandBuffer);
     }
     vkCmdEndRenderPass(commandBuffer);
+    vkdebug::endLabel(commandBuffer);
 
     /*
         Pass 2 — Vertical blur
     */
+    vkdebug::beginLabel(commandBuffer, "2 Vertical blur", {0.3f, 0.6f, 1.0f, 1.0f});
     beginOffscreenPass(1);
     _blurVertPipeline->bind(commandBuffer);
     std::array<VkDescriptorSet, 1> blurVertDS = {_blurVertDescriptorSet->getDescriptorSet()};
@@ -349,10 +355,12 @@ void MultiPassRenderer::recordToCommandBuffer(VkCommandBuffer commandBuffer, uin
         _blurVertPipeline->getPipelineLayout(), 0, 1, blurVertDS.data(), 0, nullptr);
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
+    vkdebug::endLabel(commandBuffer);
 
     /*
         Pass 3 — Horizontal blur
     */
+    vkdebug::beginLabel(commandBuffer, "3 Horizontal blur", {0.2f, 0.4f, 0.9f, 1.0f});
     beginOffscreenPass(2);
     _blurHorizPipeline->bind(commandBuffer);
     std::array<VkDescriptorSet, 1> blurHorizDS = {_blurHorizDescriptorSet->getDescriptorSet()};
@@ -360,18 +368,25 @@ void MultiPassRenderer::recordToCommandBuffer(VkCommandBuffer commandBuffer, uin
         _blurHorizPipeline->getPipelineLayout(), 0, 1, blurHorizDS.data(), 0, nullptr);
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
+    vkdebug::endLabel(commandBuffer);
 
     /*
         Pass 4 — Normal shading
     */
+    vkdebug::beginLabel(commandBuffer, "4 Normal shading", {0.3f, 0.9f, 0.3f, 1.0f});
     beginOffscreenPass(3);
-    for (auto& model : _sceneModels)
+    for (auto& model : _sceneModels) {
+        vkdebug::beginLabel(commandBuffer, model->getName().c_str());
         model->draw(commandBuffer, *this);
+        vkdebug::endLabel(commandBuffer);
+    }
     vkCmdEndRenderPass(commandBuffer);
+    vkdebug::endLabel(commandBuffer);
 
     /*
         Pass 5 — Composite
     */
+    vkdebug::beginLabel(commandBuffer, "5 Composite", {0.8f, 0.4f, 1.0f, 1.0f});
     VkRenderPassBeginInfo compositeInfo{};
     compositeInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     compositeInfo.renderPass        = _compositeRenderPass->getRenderPass();
@@ -398,6 +413,7 @@ void MultiPassRenderer::recordToCommandBuffer(VkCommandBuffer commandBuffer, uin
         _compositePipeline->getPipelineLayout(), 0, 1, compositeDS.data(), 0, nullptr);
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
+    vkdebug::endLabel(commandBuffer);
 }
 
 

@@ -28,9 +28,11 @@ public:
 
 private:
     bool _validationLayersAvailable = true;
+    bool _debugUtilsEnabled = false;
     std::string _basePath;
 
     void createVulkanInstance();
+    void loadDebugUtilsFunctions();
     void setupDebugMessenger();
     void createSurface(SDL_Window* window);
     void pickPhysicalDevice();

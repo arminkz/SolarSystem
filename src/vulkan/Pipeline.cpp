@@ -1,5 +1,6 @@
 #include "Pipeline.h"
 #include "VulkanHelper.h"
+#include "VulkanDebug.h"
 #include "geometry/Vertex.h"
 
 
@@ -212,6 +213,8 @@ void Pipeline::createGraphicsPipeline(const std::string& vertShaderPath, const s
     }else {
         spdlog::info("Graphics pipeline created successfully {}", _name != "" ? fmt::format("({})", _name) : "");
     }
+    vkdebug::setName(_ctx->device, (uint64_t)_pipeline, VK_OBJECT_TYPE_PIPELINE, params.name);
+    vkdebug::setName(_ctx->device, (uint64_t)_pipelineLayout, VK_OBJECT_TYPE_PIPELINE_LAYOUT, params.name);
 
     // Destroy shader modules after creating the pipeline
     vkDestroyShaderModule(_ctx->device, fragShaderModule, nullptr);

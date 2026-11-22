@@ -13,6 +13,10 @@ NC='\033[0m' # No Color
 # Path to glslangValidator (make sure it's in your PATH or set full path here)
 GLSLANG_PATH="glslangValidator"
 
+# Debug flags: -g embeds source, line info and names in the SPIR-V (readable shaders in
+# RenderDoc), -Od disables optimization. Set to () for stripped shaders.
+GLSL_DEBUG=(-gVS -Od)
+
 # Path to shader source folder
 SHADER_FOLDER="shaders"
 
@@ -49,7 +53,7 @@ find "$SHADER_FOLDER_FULL" -type f \( -name "*.vert" -o -name "*.frag" -o -name 
 
     echo -e "${BLUE}Compiling ${YELLOW}$RELATIVE_PATH${NC} -> ${GREEN}${OUTPUT_FILE#$OUTPUT_FOLDER_FULL/}${NC}..."
 
-    "$GLSLANG_PATH" -V "$INPUT_FILE" -o "$OUTPUT_FILE"
+    "$GLSLANG_PATH" -V "${GLSL_DEBUG[@]}" "$INPUT_FILE" -o "$OUTPUT_FILE"
     if [ $? -ne 0 ]; then
         echo -e "${RED}Failed to compile ${RELATIVE_PATH}${NC}" >&2
     else

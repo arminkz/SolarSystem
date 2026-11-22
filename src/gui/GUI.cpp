@@ -1,5 +1,6 @@
 #include "gui/GUI.h"
 #include "vulkan/VulkanHelper.h"
+#include "vulkan/VulkanDebug.h"
 #include "core/AssetPath.h"
 #include "gui/FontAwesome.h"
 
@@ -113,7 +114,9 @@ void GUI::createRenderPass(VkFormat swapChainImageFormat)
 
     if (vkCreateRenderPass(_ctx->device, &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS) {
         spdlog::error("GUI: Failed to create ImGui render pass!");
+        return;
     }
+    vkdebug::setName(_ctx->device, (uint64_t)_renderPass, VK_OBJECT_TYPE_RENDER_PASS, "ImGui Renderpass");
 }
 
 

@@ -1,4 +1,5 @@
 #include "VulkanContext.h"
+#include "vulkan/VulkanDebug.h"
 
 VulkanContext::VulkanContext(SDL_Window* window)
     : window(window)
@@ -6,6 +7,7 @@ VulkanContext::VulkanContext(SDL_Window* window)
     _basePath = SDL_GetBasePath() ? SDL_GetBasePath() : "";
 
     createVulkanInstance();
+    loadDebugUtilsFunctions();
     setupDebugMessenger();
     createSurface(window);
     pickPhysicalDevice();
@@ -49,7 +51,11 @@ void VulkanContext::createVulkanInstance() {
     instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceCreateInfo.pApplicationInfo = &appInfo;
 
-    bool enableVL = true;
+#ifdef NDEBUG
+    bool enableVL = false;              // Release: off by default
+#else
+    bool enableVL = true;               // Debug: on by default
+#endif
 
 #if __APPLE__
     enableVL = false; // Disable validation layers on macOS for now (MoltenVK issues)
@@ -82,6 +88,7 @@ void VulkanContext::createVulkanInstance() {
         spdlog::warn("Debug Utils extension not available!");
     }else {
         requiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        _debugUtilsEnabled = true;
     }
 
     // Other extensions can be added here as needed
@@ -114,6 +121,17 @@ void VulkanContext::createVulkanInstance() {
     }
 
     spdlog::info("Vulkan instance created successfully");
+}
+
+void VulkanContext::loadDebugUtilsFunctions() {
+    // The loader may return non-null trampolines for an extension that was never enabled,
+    // and calling those is undefined behaviour, so only load when we enabled VK_EXT_debug_utils.
+    if (!_debugUtilsEnabled) return;
+
+    // Instance-extension commands: load via vkGetInstanceProcAddr (works before the device exists).
+    vkdebug::vkCmdBeginDebugUtilsLabelEXT = reinterpret_cast<PFN_vkCmdBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT"));
+    vkdebug::vkCmdEndDebugUtilsLabelEXT = reinterpret_cast<PFN_vkCmdEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT"));
+    vkdebug::vkSetDebugUtilsObjectNameEXT = reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectNameEXT"));
 }
 
 void VulkanContext::setupDebugMessenger() {

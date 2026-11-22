@@ -1,9 +1,7 @@
 #include "Texture2D.h"
 
 #include "vulkan/VulkanHelper.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "vulkan/VulkanDebug.h"
 
 Texture2D::Texture2D(std::shared_ptr<VulkanContext> ctx, const std::string& path, VkFormat format) 
     : _ctx(std::move(ctx))
@@ -50,6 +48,7 @@ Texture2D::Texture2D(std::shared_ptr<VulkanContext> ctx, const std::string& path
         VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         _textureImage, _textureImageMemory);
+    vkdebug::setName(_ctx->device, (uint64_t)_textureImage, VK_OBJECT_TYPE_IMAGE, std::filesystem::path(path).filename().string());
 
     // Transition image layout to transfer destination optimal
     VkImageSubresourceRange subresourceRange{};

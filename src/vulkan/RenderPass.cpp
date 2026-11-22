@@ -1,4 +1,5 @@
 #include "RenderPass.h"
+#include "VulkanDebug.h"
 
 RenderPass::RenderPass(std::shared_ptr<VulkanContext> ctx, RenderPassParams params)
     : _ctx(std::move(ctx))
@@ -118,6 +119,7 @@ RenderPass::RenderPass(std::shared_ptr<VulkanContext> ctx, RenderPassParams para
         throw std::runtime_error("Failed to create render pass!");
     }
     spdlog::info("Render pass created successfully. ({})", params.name);
+    vkdebug::setName(_ctx->device, (uint64_t)_renderPass, VK_OBJECT_TYPE_RENDER_PASS, params.name);
 }
 
 
